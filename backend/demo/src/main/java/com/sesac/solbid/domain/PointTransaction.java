@@ -1,6 +1,6 @@
-`package com.sesac.solbid.domain;import com.sesac.solbid.domain.enums.TransEnum;
+package com.sesac.solbid.domain;
+import com.sesac.solbid.domain.enums.TransEnum;
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -11,20 +11,27 @@ public class PointTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
     private Long transactionId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
     @Enumerated(EnumType.STRING)
     private TransEnum transEnum;
+
     @Column(unique = true, nullable = false)
     private BigDecimal balanceAfter;
+
     @Column(length = 225)
     private String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
     private Payments payment_id;
+
     @Column(unique = true, nullable = false)
     private LocalDateTime createdAt;
+
     @Column(name = "point", nullable = false)
     private int point;
 }`
