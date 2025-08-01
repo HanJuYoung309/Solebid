@@ -2,24 +2,26 @@ package com.sesac.solbid.domain;
 
 import com.sesac.solbid.domain.baseentity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.extern.apachecommons.CommonsLog;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name="carts")
-public class Carts  extends BaseEntity {
+@Table(name = "carts")
+public class Carts extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
 
-    private Long productId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(unique = true, nullable = false)
+    // private Long productId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @Column(name = "product_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal productPrice;
 }
