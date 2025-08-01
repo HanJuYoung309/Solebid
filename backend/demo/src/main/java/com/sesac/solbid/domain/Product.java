@@ -32,6 +32,9 @@ public class Product extends BaseEntity {
     @OneToMany(mappedBy = "product", orphanRemoval = true)
     private List<ProductImage> productImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product")
+    List<WishList> wishLists = new ArrayList<>();
+
     //상품 카테고리(운동화, 농구화...)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
