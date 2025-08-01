@@ -32,10 +32,6 @@ public class Bid {
     @Column(unique = true, nullable = false)
     private Boolean isWinning;
 
-    @ManyToOne
-    @JoinColumn(name = "social_login_id")
-    private SocialLogin socialLogin;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bidder_id", nullable = false)
     private User bidder; // 입찰자 ID
