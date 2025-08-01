@@ -23,12 +23,12 @@ public class OrderInfo {
     // private Long winnerId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "winner_id")
-    private User winnerId;
+    private User winner;
 
     // private Long sellerId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
-    private User sellerId;
+    private User seller;
 
     @Column(name = "final_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal finalPrice;
