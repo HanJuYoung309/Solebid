@@ -1,6 +1,6 @@
 package com.sesac.solbid.domain.enums;
 
 public enum PaymentStatus {
-
-    WAITING,SUCCESS,FAIL
+    // PENDING, COMPLETED, FAILED
+    WAITING, SUCCESS, FAIL
 }
