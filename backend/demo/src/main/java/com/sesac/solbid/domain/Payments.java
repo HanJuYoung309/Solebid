@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "payments")
@@ -18,6 +20,9 @@ public class Payments extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "paymentsList")
+    private List<PointTransaction> pointTransaction = new ArrayList<>();
 
     @Column(name = "amount", nullable = false)
     private int amount;

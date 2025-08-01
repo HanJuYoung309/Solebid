@@ -26,12 +26,12 @@ public class PointTransaction {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payments payment_id;
+    @JoinColumn(name = "paymentsList")
+    private Payments paymentsList;
 
     @Column(unique = true, nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "point", nullable = false)
     private int point;
-}`
+}
