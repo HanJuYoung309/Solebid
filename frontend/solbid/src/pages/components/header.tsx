@@ -48,11 +48,23 @@ function Header()
                 <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
                     {/* 좌측 로고 + 메뉴 */}
                     <div className="flex items-center space-x-8">
-                        <h1 className="text-2xl font-bold text-blue-600">SoleBid</h1>
+
+                        <h1 className="text-2xl font-bold text-blue-600 cursor-pointer"
+                        onClick={() => navigate('/')}
+                        >SoleBid</h1>
+
                         <div className="hidden md:flex space-x-6">
-                            <a href="#" className="text-gray-600 hover:text-gray-900 cursor-pointer">경매</a>
-                            <a href="#" className="text-gray-600 hover:text-gray-900 cursor-pointer">브랜드</a>
-                            <a href="#" className="text-gray-600 hover:text-gray-900 cursor-pointer">랭킹</a>
+                            <span className="text-gray-600 hover:text-gray-900 cursor-pointer"
+                            onClick={() => navigate("/productListByAuction")}
+                            >경매</span>
+
+                            <span className="text-gray-600 hover:text-gray-900 cursor-pointer"
+                                  onClick={() => navigate("/productListByBrand")}
+                            >브랜드</span>
+
+                            <span className="text-gray-600 hover:text-gray-900 cursor-pointer"
+                                  onClick={() => navigate("/productListByRank")}
+                            >랭킹</span>
                         </div>
                     </div>
 
@@ -67,7 +79,8 @@ function Header()
                                 />
                                 <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
                             </div>
-                            <button className="px-4 py-2 bg-blue-500 text-white !rounded-r-lg hover:bg-blue-600 cursor-pointer whitespace-nowrap">
+                            <button className="px-4 py-2 bg-blue-500 text-white !rounded-r-lg hover:bg-blue-600 cursor-pointer whitespace-nowrap"
+                            onClick={() => navigate("/productListBySearch")}>
                                 검색
                             </button>
                         </div>

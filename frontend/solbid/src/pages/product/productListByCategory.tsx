@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../../css/index.css'
 
 
-function ProductListToCategory(){
+function ProductListByCategory(){
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedPriceRange, setSelectedPriceRange] = useState<string>("");
     const [sortBy, setSortBy] = useState<string>("popular");
@@ -372,4 +372,4 @@ function ProductListToCategory(){
         </div>
     );
 }
-export default ProductListToCategory;
+export default ProductListByCategory;
