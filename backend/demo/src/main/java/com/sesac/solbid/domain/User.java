@@ -63,7 +63,9 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "bidder")
     private List<Bid> bids = new ArrayList<>();
     @OneToMany(mappedBy = "winner")
-    private List<OrderInfo> orders = new ArrayList<>();
+    private List<OrderInfo> winnerOrders = new ArrayList<>();
+    @OneToMany(mappedBy = "seller")
+    private List<OrderInfo> sellerOrders = new ArrayList<>();
     @OneToMany(mappedBy = "user")
     private List<WishList> wishlists = new ArrayList<>();
     @OneToMany(mappedBy = "user")
