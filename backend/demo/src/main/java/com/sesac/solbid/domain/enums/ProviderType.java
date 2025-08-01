@@ -1,6 +1,6 @@
 package com.sesac.solbid.domain.enums;
 
-public enum ProviderEnum {
+public enum ProviderType {
 
     Kakao,Google
 }

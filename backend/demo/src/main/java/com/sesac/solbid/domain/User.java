@@ -4,14 +4,18 @@ import com.sesac.solbid.domain.baseentity.BaseEntity;
 import com.sesac.solbid.domain.enums.UserStatus;
 import com.sesac.solbid.domain.enums.UserType;
 import jakarta.persistence.*;
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="user")
 public class User extends BaseEntity {
 
@@ -19,33 +23,55 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(unique = true, nullable = false)
+    @Column(length = 100, unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true, nullable = true)
+    @Column(length = 255)
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(length = 50, unique = true, nullable = false)
     private String nickname;
 
-    @Column(unique = true, nullable = true)
+    @Column(length = 50)
+    private String name;
+
+    @Column(length = 20, unique = true, nullable = true)
     private String phone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private UserType userType;
 
     @Column(unique = true, nullable = false)
     private BigDecimal temperature;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @ColumnDefault("0")
     private BigDecimal point;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private UserStatus userStatus;
 
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
-
-
-
+    //== 연관관계 편의 메서드 ==//
+    @OneToMany(mappedBy = "user")
+    private List<SocialLogin> socialLogins = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<PointTransaction> pointTransactions = new ArrayList<>();
+    @OneToMany(mappedBy = "seller")
+    private List<Product> products = new ArrayList<>();
+    @OneToMany(mappedBy = "bidder")
+    private List<Bid> bids = new ArrayList<>();
+    @OneToMany(mappedBy = "winner")
+    private List<OrderInfo> orders = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<WishList> wishlists = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Carts> carts = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Payments> payments = new ArrayList<>();
 
 
 

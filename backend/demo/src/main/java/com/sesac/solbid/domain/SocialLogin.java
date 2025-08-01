@@ -1,27 +1,37 @@
 package com.sesac.solbid.domain;
 
-import com.sesac.solbid.domain.baseentity.BaseEntity;
-import com.sesac.solbid.domain.enums.ProviderEnum;
+import com.sesac.solbid.domain.enums.ProviderType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name="sociallogin")
-public class SocialLogin extends BaseEntity {
+@Getter
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@Table(name="social_login")
+public class SocialLogin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long socialId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(unique = true, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private ProviderType provider;
+
+    @Column(length = 100, nullable = false)
     private String providerId;
 
-    @Enumerated(EnumType.STRING)
-    private ProviderEnum provider;
-
+    @CreatedDate
+    @Column(updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 }
