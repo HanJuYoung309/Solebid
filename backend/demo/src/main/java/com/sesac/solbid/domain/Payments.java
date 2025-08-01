@@ -21,7 +21,7 @@ public class Payments extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "paymentsList")
+    @OneToMany(mappedBy = "payments")
     private List<PointTransaction> pointTransaction = new ArrayList<>();
 
     @Column(name = "amount", nullable = false)

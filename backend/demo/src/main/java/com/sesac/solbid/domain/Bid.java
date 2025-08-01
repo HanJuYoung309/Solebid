@@ -22,8 +22,6 @@ public class Bid {
     @JoinColumn(name = "auction_event_id", nullable = false)
     private AuctionEvent auctionEvent; // 경매 이벤트 ID
 
-    @Column(unique = true, nullable = false)
-    private Long bidderId;
 
     @Column(unique = true, nullable = false)
     private BigDecimal bidAmount;
