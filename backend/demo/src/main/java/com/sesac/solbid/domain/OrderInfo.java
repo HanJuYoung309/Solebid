@@ -18,7 +18,7 @@ public class OrderInfo {
     // private Long auctionEventId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_event_id")
-    private AuctionEvent auctionEventId;
+    private AuctionEvent auctionEvent;
 
     // private Long winnerId;
     @ManyToOne(fetch = FetchType.LAZY)
