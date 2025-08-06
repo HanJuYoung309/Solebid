@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 function Header()
 {
     const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 기본값을 false로 변경하여 테스트 용이하게 함
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [userProfile] = useState({
         name: "김민준",
@@ -131,7 +131,9 @@ function Header()
                         )}
 
                         {/* 회원가입 버튼 */}
-                        <button className="px-4 py-2 bg-gray-900 text-white !rounded-button hover:bg-gray-800 cursor-pointer whitespace-nowrap">
+                        <button
+                            onClick={() => navigate('/signup')}
+                            className="px-4 py-2 bg-gray-900 text-white !rounded-button hover:bg-gray-800 cursor-pointer whitespace-nowrap">
                             회원가입
                         </button>
                     </div>

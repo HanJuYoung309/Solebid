@@ -8,7 +8,11 @@ public enum ErrorCode {
     PARAMETER_TYPE_MISMATCH(400, "요청 파라미터 타입 오류"),
     VALIDATION_ERROR(400, "유효성 검사 실패"),
     FILE_UPLOAD_FAILED(400, "파일 업로드 실패"),
-    INTERNAL_SERVER_ERROR(500, "서버 내부 오류");
+    INTERNAL_SERVER_ERROR(500, "서버 내부 오류"),
+
+    // 회원 가입 에러
+    DUPLICATE_EMAIL(400, "이미 사용 중인 이메일 주소입니다."),
+    DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다.");
 
     private final int status;
     private final String message;
