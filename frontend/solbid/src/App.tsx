@@ -9,6 +9,7 @@ import ProductListBySearch from "./pages/product/productListBySearch";
 import ProductListByBrand from "./pages/product/productListByBrand";
 import ProductListByRank from "./pages/product/productListByRank";
 import Signup from "./pages/user/Signup";
+import Login from "./pages/user/Login";
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/productRegister" element={<ProductRegister />} />
                 <Route path="/productListByCategory/:categoryName" element={<ProductListByCategory />} />
                 <Route path="/productListByAuction" element={<ProductListByAuction />} />

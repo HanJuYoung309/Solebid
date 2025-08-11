@@ -12,7 +12,11 @@ public enum ErrorCode {
 
     // 회원 가입 에러
     DUPLICATE_EMAIL(400, "이미 사용 중인 이메일 주소입니다."),
-    DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다.");
+    DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다."),
+
+    // 로그인 에러
+    LOGIN_FAILED(401, "이메일 또는 비밀번호가 올바르지 않습니다."),
+    INACTIVE_USER(401, "비활성화된 계정입니다.");
 
     private final int status;
     private final String message;

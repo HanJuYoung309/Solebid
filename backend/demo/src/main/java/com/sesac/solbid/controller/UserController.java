@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -27,11 +28,24 @@ public class UserController {
         User user = userService.signup(requestDto);
         UserDto.SignupResponse responseDto = new UserDto.SignupResponse(user);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of(
-                        "is_success", true,
-                        "data", responseDto,
-                        "errorCode", ""
-                ));
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("is_success", true);
+        responseBody.put("data", responseDto);
+        responseBody.put("errorCode", null);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+    }
+
+    // 로그인
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody UserDto.LoginRequest requestDto) {
+        UserDto.LoginResponse responseDto = userService.login(requestDto);
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("is_success", true);
+        responseBody.put("data", responseDto);
+        responseBody.put("errorCode", null);
+
+        return ResponseEntity.ok(responseBody);
     }
 }

@@ -1,10 +1,12 @@
 package com.sesac.solbid.service;
 
 import com.sesac.solbid.domain.User;
+import com.sesac.solbid.domain.enums.UserStatus;
 import com.sesac.solbid.dto.UserDto;
 import com.sesac.solbid.exception.CustomException;
 import com.sesac.solbid.exception.ErrorCode;
 import com.sesac.solbid.repository.UserRepository;
+import com.sesac.solbid.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,27 +19,40 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    // 회원 가입
     @Transactional
     public User signup(UserDto.SignupRequest requestDto) {
-        // 이메일 중복 확인
         if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
-        // 닉네임 중복 확인
         if (userRepository.findByNickname(requestDto.getNickname()).isPresent()) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
-
-        // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
         User user = requestDto.toEntity(encodedPassword);
-
         return userRepository.save(user);
     }
 
-    // 사용자 ID로 사용자 조회
+    @Transactional
+    public UserDto.LoginResponse login(UserDto.LoginRequest requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAILED));
+
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.LOGIN_FAILED);
+        }
+
+        if (user.getUserStatus() != UserStatus.ACTIVE) {
+            throw new CustomException(ErrorCode.INACTIVE_USER);
+        }
+
+        final String accessToken = jwtUtil.generateToken(user.getEmail());
+        final String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
+        return new UserDto.LoginResponse(user, accessToken, refreshToken);
+    }
+
     public User findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. id=" + userId));

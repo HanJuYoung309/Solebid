@@ -1,6 +1,7 @@
 package com.sesac.solbid.dto;
 
 import com.sesac.solbid.domain.User;
+import com.sesac.solbid.domain.enums.UserType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -57,6 +58,37 @@ public class UserDto {
             this.userId = user.getUserId();
             this.email = user.getEmail();
             this.nickname = user.getNickname();
+        }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class LoginRequest {
+        @NotBlank(message = "이메일은 필수 입력 값입니다.")
+        @Email(message = "이메일 형식이 올바르지 않습니다.")
+        private String email;
+
+        @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
+        private String password;
+    }
+
+    @Getter
+    public static class LoginResponse {
+        private final Long userId;
+        private final String email;
+        private final String nickname;
+        private final UserType userType;
+        private final String accessToken;
+        private final String refreshToken;
+
+        public LoginResponse(User user, String accessToken, String refreshToken) {
+            this.userId = user.getUserId();
+            this.email = user.getEmail();
+            this.nickname = user.getNickname();
+            this.userType = user.getUserType();
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
         }
     }
 }
