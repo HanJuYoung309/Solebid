@@ -60,50 +60,5 @@ public class OAuth2Dto {
         }
     }
 
-    /**
-     * OAuth2 에러 응답 DTO
-     */
-    @Getter
-    public static class ErrorResponse {
-        private final String error;
-        private final String errorDescription;
-        private final String provider;
 
-        @Builder
-        public ErrorResponse(String error, String errorDescription, String provider) {
-            this.error = error;
-            this.errorDescription = errorDescription;
-            this.provider = provider;
-        }
-
-        /**
-         * 정적 팩토리 메서드
-         */
-        public static ErrorResponse of(String error, String errorDescription, String provider) {
-            return ErrorResponse.builder()
-                    .error(error)
-                    .errorDescription(errorDescription)
-                    .provider(provider)
-                    .build();
-        }
-    }
-
-    /**
-     * 지원하는 OAuth2 Provider 목록 응답 DTO
-     */
-    @Getter
-    public static class ProvidersResponse {
-        private final String[] supportedProviders;
-
-        public ProvidersResponse(String[] supportedProviders) {
-            this.supportedProviders = supportedProviders;
-        }
-
-        /**
-         * 정적 팩토리 메서드
-         */
-        public static ProvidersResponse of(String[] supportedProviders) {
-            return new ProvidersResponse(supportedProviders);
-        }
-    }
 }

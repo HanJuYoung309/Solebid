@@ -2,7 +2,7 @@ package com.sesac.solbid.controller;
 
 import com.sesac.solbid.domain.User;
 import com.sesac.solbid.dto.UserDto;
-import com.sesac.solbid.service.OAuth2Service;
+
 import com.sesac.solbid.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
-    private final OAuth2Service oAuth2Service;
 
     // 회원가입
     @PostMapping("/signup")
@@ -51,9 +50,4 @@ public class UserController {
         return ResponseEntity.ok(responseBody);
     }
 
-    @PostMapping("/login/social")
-    public ResponseEntity<UserDto.LoginResponse> socialLogin(@RequestBody UserDto.SocialLoginRequest request) {
-        UserDto.LoginResponse loginResponse = oAuth2Service.login(request.getProvider(), request.getAuthCode());
-        return ResponseEntity.ok(loginResponse);
-    }
 }
