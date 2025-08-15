@@ -116,7 +116,7 @@ public class OAuth2Service {
             
         } catch (WebClientResponseException e) {
             log.error("OAuth2 통신 오류: provider={}, status={}, body={}", 
-                    providerName, e.getStatusCode(), e.getResponseBodyAsString());
+                    providerName, e.getStatusCode(), maskSensitiveData(e.getResponseBodyAsString()));
             throw new OAuth2Exception(ErrorCode.OAUTH2_TOKEN_ERROR);
         } catch (Exception e) {
             log.error("OAuth2 로그인 처리 중 오류 발생: provider={}", providerName, e);
@@ -124,13 +124,7 @@ public class OAuth2Service {
         }
     }
 
-    /**
-     * 지원하는 OAuth2 Provider 목록 반환
-     */
-    public OAuth2Dto.ProvidersResponse getSupportedProviders() {
-        String[] providers = urlGenerator.getSupportedProviders();
-        return OAuth2Dto.ProvidersResponse.of(providers);
-    }
+
 
     /**
      * ClientRegistration 조회 (에러 처리 포함)
@@ -184,7 +178,7 @@ public class OAuth2Service {
             
         } catch (WebClientResponseException e) {
             log.error("OAuth2 토큰 요청 실패: provider={}, status={}, body={}", 
-                    provider.getRegistrationId(), e.getStatusCode(), e.getResponseBodyAsString());
+                    provider.getRegistrationId(), e.getStatusCode(), maskSensitiveData(e.getResponseBodyAsString()));
             throw new OAuth2Exception(ErrorCode.OAUTH2_TOKEN_ERROR);
         } catch (Exception e) {
             log.error("OAuth2 토큰 획득 중 예외 발생: provider={}", provider.getRegistrationId(), e);
@@ -216,7 +210,7 @@ public class OAuth2Service {
             
         } catch (WebClientResponseException e) {
             log.error("OAuth2 사용자 정보 요청 실패: provider={}, status={}, body={}", 
-                    provider.getRegistrationId(), e.getStatusCode(), e.getResponseBodyAsString());
+                    provider.getRegistrationId(), e.getStatusCode(), maskSensitiveData(e.getResponseBodyAsString()));
             throw new OAuth2Exception(ErrorCode.OAUTH2_USER_INFO_ERROR);
         } catch (Exception e) {
             log.error("OAuth2 사용자 정보 획득 중 예외 발생: provider={}", provider.getRegistrationId(), e);
@@ -241,5 +235,30 @@ public class OAuth2Service {
         }
         
         return localPart.substring(0, 2) + "****@" + domain;
+    }
+
+    /**
+     * 민감한 데이터 마스킹 처리 (토큰, 개인정보 등)
+     */
+    private String maskSensitiveData(String data) {
+        if (data == null || data.isEmpty()) {
+            return "****";
+        }
+        
+        // JSON 응답에서 민감한 필드들 마스킹
+        String maskedData = data
+                .replaceAll("\"access_token\"\\s*:\\s*\"[^\"]+\"", "\"access_token\":\"****\"")
+                .replaceAll("\"refresh_token\"\\s*:\\s*\"[^\"]+\"", "\"refresh_token\":\"****\"")
+                .replaceAll("\"client_secret\"\\s*:\\s*\"[^\"]+\"", "\"client_secret\":\"****\"")
+                .replaceAll("\"code\"\\s*:\\s*\"[^\"]+\"", "\"code\":\"****\"")
+                .replaceAll("\"email\"\\s*:\\s*\"([^@\"]+)@([^\"]+)\"", "\"email\":\"**@$2\"")
+                .replaceAll("\"phone\"\\s*:\\s*\"[^\"]+\"", "\"phone\":\"****\"");
+        
+        // 응답이 너무 길면 잘라내기
+        if (maskedData.length() > 500) {
+            return maskedData.substring(0, 500) + "... [truncated]";
+        }
+        
+        return maskedData;
     }
 }

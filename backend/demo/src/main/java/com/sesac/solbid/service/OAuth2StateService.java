@@ -46,24 +46,26 @@ public class OAuth2StateService {
      */
     public boolean validateState(String state) {
         if (state == null || state.trim().isEmpty()) {
-            log.warn("OAuth2 state 검증 실패: state가 null 또는 빈 값");
+            log.warn("OAuth2 state 검증 실패: state가 null 또는 빈 값 - 잠재적 CSRF 공격 시도");
             throw new OAuth2StateException();
         }
 
         StateInfo stateInfo = stateStore.get(state);
         
         if (stateInfo == null) {
-            log.warn("OAuth2 state 검증 실패: 존재하지 않는 state - {}", maskState(state));
+            log.warn("OAuth2 state 검증 실패: 존재하지 않는 state - {} - 잠재적 CSRF 공격 시도", maskState(state));
             throw new OAuth2StateException();
         }
 
         if (stateInfo.isExpired()) {
-            log.warn("OAuth2 state 검증 실패: 만료된 state - {}", maskState(state));
+            log.warn("OAuth2 state 검증 실패: 만료된 state - {} - 만료시간: {}", 
+                    maskState(state), stateInfo.getExpiryTime());
             stateStore.remove(state); // 만료된 state 제거
             throw new OAuth2StateException();
         }
 
-        log.debug("OAuth2 state 검증 성공: {}", maskState(state));
+        log.debug("OAuth2 state 검증 성공: {} - 생성시간: {}", 
+                maskState(state), stateInfo.getCreatedTime());
         return true;
     }
 
@@ -85,6 +87,7 @@ public class OAuth2StateService {
     @Scheduled(fixedRate = 600000) // 10분 = 600,000ms
     public void cleanupExpiredStates() {
         AtomicInteger removedCount = new AtomicInteger(0);
+        AtomicInteger totalCount = new AtomicInteger(stateStore.size());
         
         stateStore.entrySet().removeIf(entry -> {
             if (entry.getValue().isExpired()) {
@@ -95,8 +98,16 @@ public class OAuth2StateService {
         });
         
         int removed = removedCount.get();
+        int remaining = stateStore.size();
+        
         if (removed > 0) {
-            log.info("만료된 OAuth2 state {} 개 정리 완료", removed);
+            log.info("OAuth2 state 정리 완료 - 만료: {}, 유지: {}, 전체: {}", 
+                    removed, remaining, totalCount.get());
+        }
+        
+        // 보안 모니터링: 비정상적으로 많은 state가 쌓이는 경우 경고
+        if (remaining > 1000) {
+            log.warn("OAuth2 state 개수가 비정상적으로 많음: {} - 잠재적 공격 가능성 검토 필요", remaining);
         }
     }
 
@@ -121,14 +132,24 @@ public class OAuth2StateService {
      * State 정보를 담는 내부 클래스
      */
     private static class StateInfo {
+        private final LocalDateTime createdTime;
         private final LocalDateTime expiryTime;
 
         public StateInfo(LocalDateTime expiryTime) {
+            this.createdTime = LocalDateTime.now();
             this.expiryTime = expiryTime;
         }
 
         public boolean isExpired() {
             return LocalDateTime.now().isAfter(expiryTime);
+        }
+
+        public LocalDateTime getCreatedTime() {
+            return createdTime;
+        }
+
+        public LocalDateTime getExpiryTime() {
+            return expiryTime;
         }
     }
 }
