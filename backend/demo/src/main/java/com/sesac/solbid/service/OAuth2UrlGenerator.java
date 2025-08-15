@@ -80,27 +80,7 @@ public class OAuth2UrlGenerator {
         return builder.build().toUriString();
     }
 
-    /**
-     * 지원하는 OAuth2 provider 목록 반환
-     */
-    public String[] getSupportedProviders() {
-        return new String[]{"google", "kakao"};
-    }
 
-    /**
-     * 특정 provider가 지원되는지 확인
-     */
-    public boolean isProviderSupported(String provider) {
-        if (provider == null) {
-            return false;
-        }
-        
-        String normalizedProvider = provider.toLowerCase().trim();
-        ClientRegistration clientRegistration = clientRegistrationRepository
-                .findByRegistrationId(normalizedProvider);
-        
-        return clientRegistration != null;
-    }
 
     /**
      * 보안을 위해 state 값을 마스킹 처리
