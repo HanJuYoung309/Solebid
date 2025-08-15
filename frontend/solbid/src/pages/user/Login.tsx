@@ -79,6 +79,33 @@ const Login: React.FC = () => {
         }
     };
 
+    // 소셜 로그인 처리
+    const handleSocialLogin = async (provider: 'google' | 'kakao') => {
+        try {
+            setIsLoading(true);
+
+            // 1. OAuth2 인증 URL 요청
+            const response = await fetch(`/api/auth/oauth2/${provider}/url`);
+            const data = await response.json();
+
+            if (data.isSuccess) {
+                // 2. 소셜 플랫폼 인증 페이지로 이동
+                window.location.href = data.data.authUrl;
+            } else {
+                setErrors({
+                    submit: `${provider} 로그인 URL 생성에 실패했습니다.`
+                });
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error(`${provider} 로그인 오류:`, error);
+            setErrors({
+                submit: `${provider} 로그인 중 오류가 발생했습니다.`
+            });
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="flex items-center justify-center py-12 px-6">
@@ -181,14 +208,18 @@ const Login: React.FC = () => {
                     <div className="space-y-3">
                         <button
                             type="button"
-                            className="w-full py-3 bg-[#FEE500] text-gray-900 font-medium !rounded-button hover:bg-[#FDD800] cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
+                            onClick={() => handleSocialLogin('kakao')}
+                            disabled={isLoading}
+                            className="w-full py-3 bg-[#FEE500] text-gray-900 font-medium !rounded-button hover:bg-[#FDD800] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
                         >
                             <i className="fas fa-comment mr-2"></i>
-                            카카오 로그인
+                            {isLoading ? '처리 중...' : '카카오 로그인'}
                         </button>
                         <button
                             type="button"
-                            className="w-full py-3 bg-white border border-gray-300 text-gray-700 font-medium !rounded-button hover:bg-gray-50 cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
+                            onClick={() => handleSocialLogin('google')}
+                            disabled={isLoading}
+                            className="w-full py-3 bg-white border border-gray-300 text-gray-700 font-medium !rounded-button hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
                         >
                             <i
                                 className="fab fa-google mr-2"
@@ -199,7 +230,7 @@ const Login: React.FC = () => {
                                     WebkitTextFillColor: "transparent",
                                 }}
                             ></i>
-                            구글 로그인
+                            {isLoading ? '처리 중...' : '구글 로그인'}
                         </button>
                     </div>
                     <div className="text-center mt-8 pt-6 border-t border-gray-200">

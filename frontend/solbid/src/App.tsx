@@ -10,6 +10,7 @@ import ProductListByBrand from "./pages/product/productListByBrand";
 import ProductListByRank from "./pages/product/productListByRank";
 import Signup from "./pages/user/Signup";
 import Login from "./pages/user/Login";
+import OAuth2Callback from "./pages/user/OAuth2Callback";
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/auth/callback/:provider" element={<OAuth2Callback />} />
                 <Route path="/productRegister" element={<ProductRegister />} />
                 <Route path="/productListByCategory/:categoryName" element={<ProductListByCategory />} />
                 <Route path="/productListByAuction" element={<ProductListByAuction />} />
