@@ -27,16 +27,17 @@ const OAuth2Callback: React.FC = () => {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // 쿠키 포함
           body: JSON.stringify({ code, state })
         });
 
         const data = await response.json();
 
         if (data.isSuccess) {
-          // 토큰 저장
-          localStorage.setItem('accessToken', data.data.accessToken);
-          localStorage.setItem('refreshToken', data.data.refreshToken);
+          // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
+          // 사용자 정보만 localStorage에 저장
           localStorage.setItem('nickname', data.data.nickname);
+          localStorage.setItem('userId', data.data.userId.toString());
           
           setStatus('success');
           setMessage('로그인이 완료되었습니다. 잠시 후 메인 페이지로 이동합니다.');

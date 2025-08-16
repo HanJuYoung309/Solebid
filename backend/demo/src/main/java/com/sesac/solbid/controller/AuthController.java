@@ -5,7 +5,9 @@ import com.sesac.solbid.dto.OAuth2Dto;
 import com.sesac.solbid.dto.UserDto;
 import com.sesac.solbid.exception.OAuth2Exception;
 import com.sesac.solbid.service.OAuth2Service;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,33 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final OAuth2Service oAuth2Service;
+
+    /**
+     * 로그아웃 처리
+     * POST /api/auth/oauth2/logout
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(HttpServletResponse response) {
+        
+        log.info("로그아웃 요청");
+        
+        try {
+            // 쿠키 삭제
+            clearTokenCookies(response);
+            
+            log.info("로그아웃 완료");
+            
+            return ResponseEntity.ok(
+                ApiResponse.success("로그아웃이 완료되었습니다.", "로그아웃이 완료되었습니다.")
+            );
+            
+        } catch (Exception e) {
+            log.error("로그아웃 처리 중 예외 발생", e);
+            return ResponseEntity.internalServerError().body(
+                ApiResponse.error("INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다.")
+            );
+        }
+    }
 
     /**
      * 클라이언트 IP 주소 추출 (프록시 고려)
@@ -59,6 +88,52 @@ public class AuthController {
             return "****";
         }
         return state.substring(0, 4) + "****" + state.substring(state.length() - 4);
+    }
+
+    /**
+     * HttpOnly 쿠키로 토큰 설정
+     */
+    private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        // Access Token 쿠키 설정
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true);  // JavaScript 접근 차단
+        accessTokenCookie.setSecure(false);   // 개발환경에서는 false, 운영환경에서는 true
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(3600);    // 1시간
+        response.addCookie(accessTokenCookie);
+        
+        // Refresh Token 쿠키 설정
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);  // 개발환경에서는 false, 운영환경에서는 true
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(86400);  // 24시간
+        response.addCookie(refreshTokenCookie);
+        
+        log.debug("HttpOnly 쿠키 설정 완료: accessToken({}초), refreshToken({}초)", 3600, 86400);
+    }
+
+    /**
+     * 토큰 쿠키 삭제 (로그아웃)
+     */
+    private void clearTokenCookies(HttpServletResponse response) {
+        // Access Token 쿠키 삭제
+        Cookie accessTokenCookie = new Cookie("accessToken", "");
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(false);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(0);  // 즉시 만료
+        response.addCookie(accessTokenCookie);
+        
+        // Refresh Token 쿠키 삭제
+        Cookie refreshTokenCookie = new Cookie("refreshToken", "");
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(0);  // 즉시 만료
+        response.addCookie(refreshTokenCookie);
+        
+        log.debug("HttpOnly 쿠키 삭제 완료");
     }
 
     /**
@@ -132,10 +207,11 @@ public class AuthController {
      * @return 로그인 응답 (JWT 토큰 포함)
      */
     @PostMapping("/{provider}/callback")
-    public ResponseEntity<ApiResponse<UserDto.LoginResponse>> handleCallback(
+    public ResponseEntity<ApiResponse<OAuth2Dto.LoginSuccessResponse>> handleCallback(
             @PathVariable String provider,
             @Valid @RequestBody OAuth2Dto.CallbackRequest request,
-            HttpServletRequest httpRequest) {
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
         
         String clientIp = getClientIpAddress(httpRequest);
         String userAgent = httpRequest.getHeader("User-Agent");
@@ -148,11 +224,23 @@ public class AuthController {
                 provider, request.getCode(), request.getState()
             );
             
+            // HttpOnly 쿠키로 토큰 설정
+            setTokenCookies(httpResponse, response.getAccessToken(), response.getRefreshToken());
+            
+            // 응답에서는 토큰 제외하고 사용자 정보만 반환
+            OAuth2Dto.LoginSuccessResponse loginSuccessResponse = OAuth2Dto.LoginSuccessResponse.builder()
+                    .userId(response.getUserId())
+                    .email(response.getEmail())
+                    .nickname(response.getNickname())
+                    .userType(response.getUserType())
+                    .provider(provider)
+                    .build();
+            
             log.info("OAuth2 콜백 처리 성공: provider={}, clientIp={}, userId={}, email={}", 
                     provider, clientIp, response.getUserId(), maskEmail(response.getEmail()));
             
             return ResponseEntity.ok(
-                ApiResponse.success(response, "소셜로그인이 완료되었습니다.")
+                ApiResponse.success(loginSuccessResponse, "소셜로그인이 완료되었습니다.")
             );
             
         } catch (OAuth2Exception e) {

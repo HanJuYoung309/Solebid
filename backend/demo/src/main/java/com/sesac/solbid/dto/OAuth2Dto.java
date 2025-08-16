@@ -60,5 +60,25 @@ public class OAuth2Dto {
         }
     }
 
+    /**
+     * OAuth2 로그인 성공 응답 DTO (토큰 제외)
+     */
+    @Getter
+    public static class LoginSuccessResponse {
+        private final Long userId;
+        private final String email;
+        private final String nickname;
+        private final String userType;
+        private final String provider;
 
+        @Builder
+        public LoginSuccessResponse(Long userId, String email, String nickname, 
+                                  Object userType, String provider) {
+            this.userId = userId;
+            this.email = email;
+            this.nickname = nickname;
+            this.userType = userType != null ? userType.toString() : null;
+            this.provider = provider;
+        }
+    }
 }

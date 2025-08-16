@@ -53,6 +53,7 @@ const Login: React.FC = () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
+                    credentials: 'include', // 쿠키 포함
                     body: JSON.stringify(loginForm),
                 },
             );
@@ -60,9 +61,10 @@ const Login: React.FC = () => {
 
             if (response.ok && result.is_success) {
                 setErrors({});
-                localStorage.setItem('accessToken', result.data.accessToken);
-                localStorage.setItem('refreshToken', result.data.refreshToken);
+                // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
+                // 사용자 정보만 localStorage에 저장
                 localStorage.setItem('nickname', result.data.nickname);
+                localStorage.setItem('userId', result.data.userId.toString());
 
                 navigate("/");
                 window.location.reload();
@@ -85,7 +87,9 @@ const Login: React.FC = () => {
             setIsLoading(true);
 
             // 1. OAuth2 인증 URL 요청
-            const response = await fetch(`/api/auth/oauth2/${provider}/url`);
+            const response = await fetch(`/api/auth/oauth2/${provider}/url`, {
+                credentials: 'include' // 쿠키 포함
+            });
             const data = await response.json();
 
             if (data.isSuccess) {
