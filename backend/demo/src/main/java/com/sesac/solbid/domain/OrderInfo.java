@@ -15,17 +15,14 @@ public class OrderInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
-    // private Long auctionEventId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_event_id")
     private AuctionEvent auctionEventId;
 
-    // private Long winnerId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "winner_id")
     private User winner;
 
-    // private Long sellerId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
