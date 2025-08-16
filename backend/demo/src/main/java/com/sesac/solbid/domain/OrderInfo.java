@@ -17,7 +17,7 @@ public class OrderInfo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_event_id")
-    private AuctionEvent auctionEventId;
+    private AuctionEvent auctionEvent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "winner_id")
