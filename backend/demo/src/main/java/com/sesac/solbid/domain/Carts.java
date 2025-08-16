@@ -17,7 +17,6 @@ public class Carts extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // private Long productId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
