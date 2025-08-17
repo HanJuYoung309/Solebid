@@ -1,4 +1,3 @@
-// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState } from "react";
 
 interface BidModalProps {
@@ -9,23 +8,24 @@ interface BidModalProps {
 }
 
 interface selectedType {
-    id : number,
-    brand : string,
-    name : string,
-    image : string,
-    currentBid : string,
-    timeLeft : string,
-    bidders : number,
-    category : string
+    id: number,
+    brand: string,
+    name: string,
+    image: string,
+    currentBid: string,
+    timeLeft: string,
+    bidders: number,
+    category: string
 }
 
 const BidModal: React.FC<BidModalProps> = ({
-                                               isOpen,
-                                               onClose,
-                                               currentBid,
-                                               onSubmit,
-                                           }) => {
+    isOpen,
+    onClose,
+    currentBid,
+    onSubmit,
+}) => {
     const [bidAmount, setBidAmount] = useState<string>("");
+
     const minBidIncrement = 10000;
     const currentBidNumber = parseInt(currentBid.replace(/,/g, ""));
     const minBidAmount = currentBidNumber + minBidIncrement;
@@ -86,12 +86,13 @@ const BidModal: React.FC<BidModalProps> = ({
     );
 };
 
-const ProductListByAuction: React.FC = () => {
+const Auction: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState("전체");
     const [priceRange, setPriceRange] = useState([0, 1000000]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [sortOption, setSortOption] = useState("남은시간순");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
     const categories = ["전체", "운동화", "구두", "샌들", "슬리퍼", "부츠"];
     const sortOptions = ["남은시간순", "인기순", "최신순"];
     const auctionItems = [
@@ -168,7 +169,6 @@ const ProductListByAuction: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-
             <div className="max-w-[1440px] mx-auto px-6 pt-24 pb-12">
                 <div className="bg-white shadow-sm rounded-lg p-6 mb-8">
                     <div className="flex flex-wrap items-center justify-between gap-4">
@@ -177,11 +177,10 @@ const ProductListByAuction: React.FC = () => {
                                 <button
                                     key={category}
                                     onClick={() => setSelectedCategory(category)}
-                                    className={`px-4 py-2 !rounded-button whitespace-nowrap cursor-pointer ${
-                                        selectedCategory === category
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                    }`}
+                                    className={`px-4 py-2 !rounded-button whitespace-nowrap cursor-pointer ${selectedCategory === category
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        }`}
                                 >
                                     {category}
                                 </button>
@@ -251,19 +250,19 @@ const ProductListByAuction: React.FC = () => {
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="text-sm text-gray-600">현재 입찰가</span>
                                     <span className="text-lg font-semibold text-blue-600">
-                    ₩{item.currentBid}
-                  </span>
+                                        ₩{item.currentBid}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between items-center mb-4">
                                     <span className="text-sm text-gray-600">남은 시간</span>
                                     <span className="text-sm font-medium text-red-500">
-                    {item.timeLeft}
-                  </span>
+                                        {item.timeLeft}
+                                    </span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
-                    {item.bidders}명 참여
-                  </span>
+                                    <span className="text-sm text-gray-500">
+                                        {item.bidders}명 참여
+                                    </span>
                                     <button
                                         onClick={() => {
                                             setSelectedItem(item);
@@ -279,7 +278,6 @@ const ProductListByAuction: React.FC = () => {
                     ))}
                 </div>
             </div>
-
             {/* Bid Modal */}
             {isModalOpen && selectedItem && (
                 <BidModal
@@ -301,4 +299,5 @@ const ProductListByAuction: React.FC = () => {
         </div>
     );
 };
-export default ProductListByAuction;
+
+export default Auction;

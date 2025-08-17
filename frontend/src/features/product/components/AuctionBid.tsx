@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import {useNavigate} from "react-router-dom";
-import '../../css/index.css'
+import { useNavigate } from "react-router-dom";
 
-function ProductRegister()
-{
+function AuctionBid() {
     const navigate = useNavigate();
 
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-
     const [productInfo, setProductInfo] = useState({
         name: "",
         brand: "",
@@ -55,42 +52,51 @@ function ProductRegister()
         if (!productInfo.name.trim()) {
             newErrors.name = "상품명을 입력해주세요.";
         }
+
         if (!productInfo.brand) {
             newErrors.brand = "브랜드를 선택해주세요.";
         }
+
         if (!productInfo.category) {
             newErrors.category = "카테고리를 선택해주세요.";
         }
+
         if (!productInfo.size) {
             newErrors.size = "사이즈를 선택해주세요.";
         }
+
         if (!productInfo.startPrice) {
             newErrors.startPrice = "시작가를 입력해주세요.";
         }
+
         if (!productInfo.confirmationPrice) {
             newErrors.confirmationPrice = "즉시 구매가를 입력해주세요.";
         }
+
         if (!productInfo.startDate) {
             newErrors.startDate = "경매 시작일을 선택해주세요.";
         }
+
         if (!productInfo.endDate) {
             newErrors.endDate = "경매 종료일을 선택해주세요.";
         }
+
         if (!productInfo.condition) {
             newErrors.condition = "상품 상태를 선택해주세요.";
         }
 
         setErrors(newErrors);
+
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async () => {
-
-        if(!validateForm())
-            return;
+        if (!validateForm()) return;
 
         const formData = new FormData();
-        selectedFiles.forEach(file => {formData.append("files", file)});
+
+        selectedFiles.forEach(file => { formData.append("files", file) });
+
         formData.append("name", productInfo.name);
         formData.append("brand", productInfo.brand);
         formData.append("category", productInfo.category);
@@ -102,12 +108,12 @@ function ProductRegister()
         formData.append("condition", productInfo.condition);
         formData.append("description", productInfo.description);
 
-        const res = await fetch("/api/productRegister", {
+        const res = await fetch("/api/auction/bid", {
             method: "POST",
-            body : formData,
+            body: formData,
         });
 
-        if(!res.ok){
+        if (!res.ok) {
             const errorData = await res.json();
             alert(errorData.message);
             return;
@@ -136,7 +142,6 @@ function ProductRegister()
                         경매 상품 등록
                     </h1>
                 </header>
-
                 {/* Main Content */}
                 <div className="max-w-3xl mx-auto py-8 px-6">
                     {/* Image Upload */}
@@ -188,7 +193,6 @@ function ProductRegister()
                             </div>
                         )}
                     </div>
-
                     {/* Product Information */}
                     <div className="space-y-6">
                         <div>
@@ -208,7 +212,6 @@ function ProductRegister()
                                 <p className="text-red-500 text-sm mt-1">{errors.name}</p>
                             )}
                         </div>
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -235,7 +238,6 @@ function ProductRegister()
                                     <p className="text-red-500 text-sm mt-1">{errors.brand}</p>
                                 )}
                             </div>
-
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     카테고리
@@ -265,7 +267,6 @@ function ProductRegister()
                                 )}
                             </div>
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 사이즈
@@ -274,11 +275,10 @@ function ProductRegister()
                                 {sizes.map((size) => (
                                     <button
                                         key={size}
-                                        className={`px-3 py-2 text-sm border !rounded-button cursor-pointer whitespace-nowrap ${
-                                            productInfo.size === size.toString()
-                                                ? "bg-blue-500 text-white border-blue-500"
-                                                : "border-gray-300 text-gray-700 hover:border-blue-500"
-                                        }`}
+                                        className={`px-3 py-2 text-sm border !rounded-button cursor-pointer whitespace-nowrap ${productInfo.size === size.toString()
+                                            ? "bg-blue-500 text-white border-blue-500"
+                                            : "border-gray-300 text-gray-700 hover:border-blue-500"
+                                            }`}
                                         onClick={() =>
                                             setProductInfo({ ...productInfo, size: size.toString() })
                                         }
@@ -291,7 +291,6 @@ function ProductRegister()
                                 <p className="text-red-500 text-sm mt-1">{errors.size}</p>
                             )}
                         </div>
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -311,8 +310,8 @@ function ProductRegister()
                                         }
                                     />
                                     <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    원
-                  </span>
+                                        원
+                                    </span>
                                 </div>
                                 {errors.startPrice && (
                                     <p className="text-red-500 text-sm mt-1">
@@ -320,7 +319,6 @@ function ProductRegister()
                                     </p>
                                 )}
                             </div>
-
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     즉시 구매가
@@ -339,8 +337,8 @@ function ProductRegister()
                                         }
                                     />
                                     <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    원
-                  </span>
+                                        원
+                                    </span>
                                 </div>
                                 {errors.buyNowPrice && (
                                     <p className="text-red-500 text-sm mt-1">
@@ -349,7 +347,6 @@ function ProductRegister()
                                 )}
                             </div>
                         </div>
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -372,7 +369,6 @@ function ProductRegister()
                                     </p>
                                 )}
                             </div>
-
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     경매 종료일
@@ -390,7 +386,6 @@ function ProductRegister()
                                 )}
                             </div>
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 상품 상태
@@ -422,7 +417,6 @@ function ProductRegister()
                                 <p className="text-red-500 text-sm mt-1">{errors.condition}</p>
                             )}
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 상세 설명
@@ -441,7 +435,6 @@ function ProductRegister()
                         </div>
                     </div>
                 </div>
-
                 {/* Footer Buttons */}
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
                     <div className="max-w-3xl mx-auto px-6 py-4 flex space-x-4">
@@ -450,7 +443,7 @@ function ProductRegister()
                             className="flex-1"
                         >
                             <button className="w-full px-6 py-3 border border-gray-300 text-gray-700 !rounded-button hover:bg-gray-50 cursor-pointer whitespace-nowrap"
-                                    onClick={() => navigate("/")}
+                                onClick={() => navigate("/")}
                             >
                                 취소
                             </button>
@@ -463,7 +456,6 @@ function ProductRegister()
                         </button>
                     </div>
                 </div>
-
                 {/* Success Toast */}
                 {showSuccessToast && (
                     <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
@@ -478,4 +470,4 @@ function ProductRegister()
     );
 }
 
-export default ProductRegister;
+export default AuctionBid;
