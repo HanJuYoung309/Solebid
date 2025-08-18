@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import {useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Header()
-{
+function MainHeader() {
     const navigate = useNavigate();
+
     const [isLoggedIn, setIsLoggedIn] = useState(true);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [userProfile] = useState({
@@ -18,15 +18,18 @@ function Header()
         email: "",
         password: "",
     });
+
     const handleLoginSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Handle login logic here
         console.log("Login attempted:", loginForm);
     };
-    React.useEffect(() => {
+
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const profileMenu = document.getElementById("profile-menu");
             const profileButton = document.getElementById("profile-button");
+
             if (
                 profileMenu &&
                 profileButton &&
@@ -38,36 +41,33 @@ function Header()
         };
 
         document.addEventListener("mousedown", handleClickOutside);
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
     return (
         <>
             <nav className="bg-white shadow-sm">
                 <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
                     {/* 좌측 로고 + 메뉴 */}
                     <div className="flex items-center space-x-8">
-
                         <h1 className="text-2xl font-bold text-blue-600 cursor-pointer"
-                        onClick={() => navigate('/')}
+                            onClick={() => navigate('/')}
                         >SoleBid</h1>
-
                         <div className="hidden md:flex space-x-6">
                             <span className="text-gray-600 hover:text-gray-900 cursor-pointer"
-                            onClick={() => navigate("/productListByAuction")}
+                                onClick={() => navigate("/auction")}
                             >경매</span>
-
                             <span className="text-gray-600 hover:text-gray-900 cursor-pointer"
-                                  onClick={() => navigate("/productListByBrand")}
+                                onClick={() => navigate("/brand")}
                             >브랜드</span>
-
                             <span className="text-gray-600 hover:text-gray-900 cursor-pointer"
-                                  onClick={() => navigate("/productListByRank")}
+                                onClick={() => navigate("/ranking")}
                             >랭킹</span>
                         </div>
                     </div>
-
                     {/* 우측 검색 + 버튼들 */}
                     <div className="flex items-center space-x-4">
                         <div className="flex items-center">
@@ -80,18 +80,16 @@ function Header()
                                 <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
                             </div>
                             <button className="px-4 py-2 bg-blue-500 text-white !rounded-r-lg hover:bg-blue-600 cursor-pointer whitespace-nowrap"
-                            onClick={() => navigate("/productListBySearch")}>
+                                onClick={() => navigate("/search")}>
                                 검색
                             </button>
                         </div>
-
                         <button
                             className="px-4 py-2 bg-blue-500 text-white !rounded-button hover:bg-blue-600 cursor-pointer whitespace-nowrap"
-                            onClick={() => navigate(`/productRegister`)}
+                            onClick={() => navigate(`/auction/bid`)}
                         >
                             경매 등록
                         </button>
-
                         {isLoggedIn ? (
                             <div className="relative">
                                 <button
@@ -103,9 +101,8 @@ function Header()
                                 </button>
                                 {/* 드롭다운 메뉴 */}
                                 <div
-                                    className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg transition-all duration-200 z-50 ${
-                                        showProfileMenu ? "opacity-100 visible" : "opacity-0 invisible"
-                                    }`}
+                                    className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg transition-all duration-200 z-50 ${showProfileMenu ? "opacity-100 visible" : "opacity-0 invisible"
+                                        }`}
                                 >
                                     <a href="#profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                                         <i className="fas fa-user mr-2"></i>마이페이지
@@ -129,7 +126,6 @@ function Header()
                                 로그인
                             </button>
                         )}
-
                         {/* 회원가입 버튼 */}
                         <button className="px-4 py-2 bg-gray-900 text-white !rounded-button hover:bg-gray-800 cursor-pointer whitespace-nowrap">
                             회원가입
@@ -137,7 +133,6 @@ function Header()
                     </div>
                 </div>
             </nav>
-
             {/* 로그인 모달 */}
             {showLoginModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -175,4 +170,4 @@ function Header()
     );
 }
 
-export default Header;
+export default MainHeader;

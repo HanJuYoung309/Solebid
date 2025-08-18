@@ -1,20 +1,19 @@
-// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
-import React from "react";
+import React, { useState } from "react";
 
 interface ProductType {
-        id: number,
-        name: string,
-        image: string,
-        currentBid: string,
-        timeLeft: string,
-        bidders: number
+    id: number,
+    name: string,
+    image: string,
+    currentBid: string,
+    timeLeft: string,
+    bidders: number
 };
 
-const ProductListByBrand: React.FC = () => {
-    const [selectedProduct, setSelectedProduct] = React.useState<ProductType | null>(null);
-    const [bidAmount, setBidAmount] = React.useState<string>("");
-    const [showModal, setShowModal] = React.useState<boolean>(false);
-    const [error, setError] = React.useState<string>("");
+const Brand: React.FC = () => {
+    const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
+    const [bidAmount, setBidAmount] = useState<string>("");
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
 
     const handleBidClick = (product: ProductType) => {
         setSelectedProduct(product);
@@ -90,6 +89,7 @@ const ProductListByBrand: React.FC = () => {
             logo: "https://readdy.ai/api/search-image?query=minimal%20modern%20asics%20logo%20design%20on%20clean%20white%20background%20professional%20branding%20photography%20elegant%20commercial%20shot%20with%20soft%20shadows&width=120&height=120&seq=17&orientation=squarish",
         },
     ];
+
     const brandProducts = [
         {
             brand: "나이키",
@@ -126,9 +126,9 @@ const ProductListByBrand: React.FC = () => {
             ],
         },
     ];
+
     return (
         <div className="min-h-screen bg-gray-50">
-
             <div className="max-w-[1440px] mx-auto px-6 pt-24 pb-12">
                 <section className="mb-12">
                     <h2 className="text-2xl font-bold mb-8">인기 브랜드</h2>
@@ -184,17 +184,17 @@ const ProductListByBrand: React.FC = () => {
                                         <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
                                             <span>현재 입찰가</span>
                                             <span className="font-semibold text-blue-600">
-                        ₩{product.currentBid}
-                      </span>
+                                                ₩{product.currentBid}
+                                            </span>
                                         </div>
                                         <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
                                             <span>남은 시간</span>
                                             <span className="font-medium">{product.timeLeft}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">
-                        {product.bidders}명 참여
-                      </span>
+                                            <span className="text-sm text-gray-500">
+                                                {product.bidders}명 참여
+                                            </span>
                                             <button
                                                 onClick={() => handleBidClick(product)}
                                                 className="px-4 py-2 bg-blue-500 text-white !rounded-button hover:bg-blue-600 text-sm whitespace-nowrap"
@@ -209,7 +209,6 @@ const ProductListByBrand: React.FC = () => {
                     ))}
                 </section>
             </div>
-
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl p-6 w-full max-w-md">
@@ -222,32 +221,28 @@ const ProductListByBrand: React.FC = () => {
                                 <i className="fas fa-times"></i>
                             </button>
                         </div>
-
                         {selectedProduct && (
                             <>
                                 <div className="mb-4">
                                     <p className="text-gray-600 mb-2">상품명</p>
                                     <p className="font-medium">{selectedProduct.name}</p>
                                 </div>
-
                                 <div className="mb-4">
                                     <p className="text-gray-600 mb-2">현재 최고 입찰가</p>
                                     <p className="font-medium text-blue-600">
                                         ₩{selectedProduct.currentBid}
                                     </p>
                                 </div>
-
                                 <div className="mb-4">
                                     <p className="text-gray-600 mb-2">최소 입찰 단위</p>
                                     <p className="font-medium">₩10,000</p>
                                 </div>
-
                                 <div className="mb-4">
                                     <label className="block text-gray-600 mb-2">입찰 금액</label>
                                     <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      ₩
-                    </span>
+                                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                            ₩
+                                        </span>
                                         <input
                                             type="text"
                                             value={bidAmount}
@@ -267,7 +262,6 @@ const ProductListByBrand: React.FC = () => {
                                         <p className="text-red-500 text-sm mt-1">{error}</p>
                                     )}
                                 </div>
-
                                 <button
                                     onClick={handleBidSubmit}
                                     className="w-full px-4 py-2 bg-blue-500 text-white !rounded-button hover:bg-blue-600 whitespace-nowrap"
@@ -282,4 +276,5 @@ const ProductListByBrand: React.FC = () => {
         </div>
     );
 };
-export default ProductListByBrand;
+
+export default Brand;

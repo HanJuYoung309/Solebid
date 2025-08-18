@@ -1,23 +1,21 @@
 import { useState } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-function Index() {
-
+function MainContent() {
     const navigate = useNavigate();
 
     const [currentTab, setCurrentTab] = useState("trending");
 
-
-
-
     const heroImage =
         "https://readdy.ai/api/search-image?query=modern%20elegant%20luxury%20sneakers%20artistically%20arranged%20in%20minimal%20studio%20setting%20with%20soft%20gradient%20background%2C%20professional%20product%20photography%20with%20dramatic%20lighting%20and%20shadows&width=800&height=600&seq=1&orientation=landscape";
+
     const categories = [
         { name: "스니커즈", icon: "fa-shoe-prints", count: "2,431" },
         { name: "러닝화", icon: "fa-running", count: "1,523" },
         { name: "농구화", icon: "fa-basketball", count: "842" },
         { name: "캔버스화", icon: "fa-socks", count: "976" },
     ];
+
     const trendingProducts = [
         {
             image:
@@ -52,6 +50,7 @@ function Index() {
             timeLeft: "4:55:32",
         },
     ];
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Navigation */}
@@ -93,26 +92,25 @@ function Index() {
                         <div
                             key={index}
                             className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                            onClick={() => navigate(`/productListToCategory/${category.name}`)}
+                            onClick={() => navigate(`/category/${category.name}`)}
                         >
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-lg font-medium text-gray-900">
-                                            {category.name}
-                                        </h4>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            {category.count}개의 상품
-                                        </p>
-                                    </div>
-                                    <i
-                                        className={`fas ${category.icon} text-2xl text-blue-500`}
-                                    ></i>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="text-lg font-medium text-gray-900">
+                                        {category.name}
+                                    </h4>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        {category.count}개의 상품
+                                    </p>
                                 </div>
+                                <i
+                                    className={`fas ${category.icon} text-2xl text-blue-500`}
+                                ></i>
+                            </div>
                         </div>
                     ))}
                 </div>
             </div>
-
             {/* Products */}
             <div className="max-w-[1440px] mx-auto px-6 pb-12">
                 <div className="flex items-center justify-between mb-6">
@@ -122,21 +120,19 @@ function Index() {
                     <div className="flex space-x-4">
                         <button
                             onClick={() => setCurrentTab("trending")}
-                            className={`px-4 py-2 !rounded-button cursor-pointer whitespace-nowrap ${
-                                currentTab === "trending"
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-white text-gray-600"
-                            }`}
+                            className={`px-4 py-2 !rounded-button cursor-pointer whitespace-nowrap ${currentTab === "trending"
+                                ? "bg-blue-500 text-white"
+                                : "bg-white text-gray-600"
+                                }`}
                         >
                             인기순
                         </button>
                         <button
                             onClick={() => setCurrentTab("ending")}
-                            className={`px-4 py-2 !rounded-button cursor-pointer whitespace-nowrap ${
-                                currentTab === "ending"
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-white text-gray-600"
-                            }`}
+                            className={`px-4 py-2 !rounded-button cursor-pointer whitespace-nowrap ${currentTab === "ending"
+                                ? "bg-blue-500 text-white"
+                                : "bg-white text-gray-600"
+                                }`}
                         >
                             마감임박
                         </button>
@@ -186,4 +182,5 @@ function Index() {
         </div>
     );
 };
-export default Index
+
+export default MainContent

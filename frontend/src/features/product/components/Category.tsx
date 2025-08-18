@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { useParams } from 'react-router-dom';
-import '../../css/index.css'
 
-
-function ProductListByCategory(){
+function Category() {
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedPriceRange, setSelectedPriceRange] = useState<string>("");
     const [sortBy, setSortBy] = useState<string>("popular");
     const [currentPage, setCurrentPage] = useState(1);
 
-    const { categoryName  } = useParams();
-    const decodedCategory = categoryName  ? decodeURIComponent(categoryName ) : '';
+    const { categoryName } = useParams();
 
+    const decodedCategory = categoryName ? decodeURIComponent(categoryName) : '';
 
     const brands = ["Nike", "Adidas", "New Balance", "Puma", "Converse", "Vans"];
+
     const priceRanges = [
         { value: "0-100000", label: "10만원 이하" },
         { value: "100000-200000", label: "10-20만원" },
@@ -163,7 +162,6 @@ function ProductListByCategory(){
 
     return (
         <div className="min-h-screen bg-gray-50">
-
             {/* Breadcrumb */}
             <div className="max-w-[1440px] mx-auto px-6 py-4">
                 <div className="flex items-center space-x-2 text-sm text-gray-500">
@@ -178,7 +176,6 @@ function ProductListByCategory(){
                     <span className="text-gray-900">{decodedCategory}</span>
                 </div>
             </div>
-
             <div className="max-w-[1440px] mx-auto px-6 pb-12">
                 {/* Page Header */}
                 <div className="mb-8">
@@ -189,7 +186,6 @@ function ProductListByCategory(){
                         다양한 브랜드의 프리미엄 {decodedCategory}를 경매로 만나보세요
                     </p>
                 </div>
-
                 {/* Filters and Sort */}
                 <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -201,18 +197,16 @@ function ProductListByCategory(){
                                     <button
                                         key={brand}
                                         onClick={() => handleBrandFilter(brand)}
-                                        className={`px-3 py-1 text-sm !rounded-button border cursor-pointer whitespace-nowrap ${
-                                            selectedBrands.includes(brand)
-                                                ? "bg-blue-500 text-white border-blue-500"
-                                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-500"
-                                        }`}
+                                        className={`px-3 py-1 text-sm !rounded-button border cursor-pointer whitespace-nowrap ${selectedBrands.includes(brand)
+                                            ? "bg-blue-500 text-white border-blue-500"
+                                            : "bg-white text-gray-700 border-gray-300 hover:border-blue-500"
+                                            }`}
                                     >
                                         {brand}
                                     </button>
                                 ))}
                             </div>
                         </div>
-
                         {/* Price Range Filter */}
                         <div>
                             <h3 className="text-sm font-medium text-gray-900 mb-3">가격대</h3>
@@ -232,7 +226,6 @@ function ProductListByCategory(){
                                 <i className="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
                             </div>
                         </div>
-
                         {/* Sort Options */}
                         <div>
                             <h3 className="text-sm font-medium text-gray-900 mb-3">정렬</h3>
@@ -253,14 +246,13 @@ function ProductListByCategory(){
                         </div>
                     </div>
                 </div>
-
                 {/* Results Count */}
                 <div className="flex items-center justify-between mb-6">
                     <p className="text-gray-600">
                         총{" "}
                         <span className="font-semibold text-gray-900">
-              {sneakers.length}
-            </span>
+                            {sneakers.length}
+                        </span>
                         개의 상품
                     </p>
                     <div className="flex items-center space-x-2">
@@ -272,7 +264,6 @@ function ProductListByCategory(){
                         </button>
                     </div>
                 </div>
-
                 {/* Product Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
                     {sneakers.map((sneaker) => (
@@ -318,8 +309,8 @@ function ProductListByCategory(){
                                         <div className="flex items-center space-x-1">
                                             <i className="fas fa-clock text-red-500 text-xs"></i>
                                             <span className="text-sm font-medium text-red-500">
-                        {sneaker.timeLeft}
-                      </span>
+                                                {sneaker.timeLeft}
+                                            </span>
                                         </div>
                                         <button className="px-3 py-1 bg-blue-500 text-white text-xs !rounded-button hover:bg-blue-600 cursor-pointer whitespace-nowrap">
                                             입찰하기
@@ -330,7 +321,6 @@ function ProductListByCategory(){
                         </div>
                     ))}
                 </div>
-
                 {/* Pagination */}
                 <div className="flex items-center justify-center space-x-2">
                     <button
@@ -340,24 +330,21 @@ function ProductListByCategory(){
                     >
                         <i className="fas fa-chevron-left"></i>
                     </button>
-
                     {[...Array(totalPages)].map((_, index) => {
                         const page = index + 1;
                         return (
                             <button
                                 key={page}
                                 onClick={() => setCurrentPage(page)}
-                                className={`px-3 py-2 text-sm rounded-lg cursor-pointer ${
-                                    currentPage === page
-                                        ? "bg-blue-500 text-white"
-                                        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                                }`}
+                                className={`px-3 py-2 text-sm rounded-lg cursor-pointer ${currentPage === page
+                                    ? "bg-blue-500 text-white"
+                                    : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    }`}
                             >
                                 {page}
                             </button>
                         );
                     })}
-
                     <button
                         onClick={() =>
                             setCurrentPage(Math.min(totalPages, currentPage + 1))
@@ -372,4 +359,5 @@ function ProductListByCategory(){
         </div>
     );
 }
-export default ProductListByCategory;
+
+export default Category;

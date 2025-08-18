@@ -1,9 +1,9 @@
-// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
-import React, { useState, useMemo } from "react";
-const ProductListBySearch: React.FC = () => {
+import React, { useMemo, useState } from "react";
+
+const Search: React.FC = () => {
     const [searchQuery] = useState("나이키");
     const [sortBy, setSortBy] = useState("인기순");
-    // Close dropdown when clicking outside
+
     React.useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const itemsDropdown = document.getElementById("itemsPerPageDropdown");
@@ -27,11 +27,14 @@ const ProductListBySearch: React.FC = () => {
                 sortMenu.classList.add("hidden");
             }
         };
+
         document.addEventListener("mousedown", handleClickOutside);
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
     const [showFilters, setShowFilters] = useState(false);
     const [priceRange, setPriceRange] = useState([0, 500000]);
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -39,6 +42,7 @@ const ProductListBySearch: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(12);
     const [showToast, setShowToast] = useState(false);
+
     const brands = ["Nike", "Adidas", "New Balance", "Converse", "Vans", "Puma"];
     const sizes = [
         "230",
@@ -53,7 +57,9 @@ const ProductListBySearch: React.FC = () => {
         "275",
         "280",
     ];
+
     const sortOptions = ["인기순", "가격 높은순", "가격 낮은순", "최신순"];
+
     const allSearchResults = [
         {
             image:
@@ -164,19 +170,23 @@ const ProductListBySearch: React.FC = () => {
             timeLeft: "4:30:15",
         },
     ];
+
     const filteredResults = useMemo(() => {
         let filtered = allSearchResults;
+
         // Filter by selected brands
         if (selectedBrands.length > 0) {
             filtered = filtered.filter((product) =>
                 selectedBrands.includes(product.brand),
             );
         }
+
         // Filter by price range
         filtered = filtered.filter((product) => {
             const price = parseInt(product.price.replace(",", ""));
             return price >= priceRange[0] && price <= priceRange[1];
         });
+
         // Sort results
         switch (sortBy) {
             case "가격 높은순":
@@ -201,44 +211,53 @@ const ProductListBySearch: React.FC = () => {
                 filtered.sort((a, b) => b.bidCount - a.bidCount);
                 break;
         }
+
         return filtered;
     }, [selectedBrands, priceRange, sortBy]);
+
     const totalResults = filteredResults.length;
     const totalPages = Math.ceil(totalResults / itemsPerPage);
+
     const handleBrandChange = (brand: string) => {
         setSelectedBrands((prev) =>
             prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
         );
         setCurrentPage(1); // Reset to first page when filter changes
     };
+
     const handleSizeChange = (size: string) => {
         setSelectedSizes((prev) =>
             prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
         );
     };
+
     const resetFilters = () => {
         setPriceRange([0, 500000]);
         setSelectedBrands([]);
         setSelectedSizes([]);
         setCurrentPage(1);
         setSortBy("인기순");
+
         const priceRangeInput = document.querySelector(
             'input[type="range"]',
         ) as HTMLInputElement;
+
         if (priceRangeInput) {
             priceRangeInput.value = "500000";
         }
+
         const brandCheckboxes = document.querySelectorAll(
             'input[type="checkbox"]',
         ) as NodeListOf<HTMLInputElement>;
+
         brandCheckboxes.forEach((checkbox) => {
             checkbox.checked = false;
         });
     };
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Navigation */}
-
             <div className="max-w-[1440px] mx-auto px-6 py-8">
                 {/* Search Results Header */}
                 <div className="mb-8">
@@ -276,11 +295,10 @@ const ProductListBySearch: React.FC = () => {
                                     {sortOptions.map((option) => (
                                         <button
                                             key={option}
-                                            className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${
-                                                sortBy === option
-                                                    ? "bg-blue-50 text-blue-600"
-                                                    : "text-gray-700"
-                                            }`}
+                                            className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${sortBy === option
+                                                ? "bg-blue-50 text-blue-600"
+                                                : "text-gray-700"
+                                                }`}
                                             onClick={() => {
                                                 setSortBy(option);
                                                 setCurrentPage(1);
@@ -362,11 +380,10 @@ const ProductListBySearch: React.FC = () => {
                                     <button
                                         key={size}
                                         onClick={() => handleSizeChange(size)}
-                                        className={`px-3 py-2 text-sm !rounded-button border cursor-pointer whitespace-nowrap ${
-                                            selectedSizes.includes(size)
-                                                ? "bg-blue-500 text-white border-blue-500"
-                                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                                        }`}
+                                        className={`px-3 py-2 text-sm !rounded-button border cursor-pointer whitespace-nowrap ${selectedSizes.includes(size)
+                                            ? "bg-blue-500 text-white border-blue-500"
+                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                            }`}
                                     >
                                         {size}
                                     </button>
@@ -386,9 +403,8 @@ const ProductListBySearch: React.FC = () => {
                     </div>
                     {/* Toast Notification */}
                     <div
-                        className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-opacity duration-300 ${
-                            showToast ? "opacity-100" : "opacity-0 pointer-events-none"
-                        }`}
+                        className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 transition-opacity duration-300 ${showToast ? "opacity-100" : "opacity-0 pointer-events-none"
+                            }`}
                     >
                         <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg">
                             <div className="flex items-center space-x-2">
@@ -472,11 +488,10 @@ const ProductListBySearch: React.FC = () => {
                                         {[12, 24, 36].map((count) => (
                                             <button
                                                 key={count}
-                                                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 ${
-                                                    itemsPerPage === count
-                                                        ? "bg-blue-50 text-blue-600"
-                                                        : "text-gray-700"
-                                                }`}
+                                                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 ${itemsPerPage === count
+                                                    ? "bg-blue-50 text-blue-600"
+                                                    : "text-gray-700"
+                                                    }`}
                                                 onClick={() => {
                                                     setItemsPerPage(count);
                                                     setCurrentPage(1);
@@ -509,11 +524,10 @@ const ProductListBySearch: React.FC = () => {
                                         <button
                                             key={pageNum}
                                             onClick={() => setCurrentPage(pageNum)}
-                                            className={`px-3 py-2 !rounded-button cursor-pointer whitespace-nowrap ${
-                                                currentPage === pageNum
-                                                    ? "bg-blue-500 text-white"
-                                                    : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                                            }`}
+                                            className={`px-3 py-2 !rounded-button cursor-pointer whitespace-nowrap ${currentPage === pageNum
+                                                ? "bg-blue-500 text-white"
+                                                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                                                }`}
                                         >
                                             {pageNum}
                                         </button>
@@ -536,4 +550,5 @@ const ProductListBySearch: React.FC = () => {
         </div>
     );
 };
-export default ProductListBySearch;
+
+export default Search;

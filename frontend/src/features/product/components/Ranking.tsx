@@ -1,7 +1,8 @@
-// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
 import React, { useState } from "react";
-const ProductListByRank: React.FC = () => {
+
+const Ranking: React.FC = () => {
     const [activeTab, setActiveTab] = useState("products");
+
     const productRankings = [
         {
             rank: 1,
@@ -28,6 +29,7 @@ const ProductListByRank: React.FC = () => {
             bidders: 128,
         },
     ];
+
     const sellerRankings = [
         {
             rank: 1,
@@ -54,6 +56,7 @@ const ProductListByRank: React.FC = () => {
             trustScore: 4.7,
         },
     ];
+
     const bidderRankings = [
         {
             rank: 1,
@@ -80,38 +83,35 @@ const ProductListByRank: React.FC = () => {
             totalAmount: "25,780,000",
         },
     ];
+
     return (
         <div className="min-h-screen bg-gray-50">
-
             <div className="max-w-[1440px] mx-auto px-6 py-8">
                 <div className="flex space-x-4 border-b border-gray-200 mb-8">
                     <button
                         onClick={() => setActiveTab("products")}
-                        className={`px-6 py-4 font-medium !rounded-button whitespace-nowrap ${
-                            activeTab === "products"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600"
-                        }`}
+                        className={`px-6 py-4 font-medium !rounded-button whitespace-nowrap ${activeTab === "products"
+                            ? "text-blue-600 border-b-2 border-blue-600"
+                            : "text-gray-600"
+                            }`}
                     >
                         상품 랭킹
                     </button>
                     <button
                         onClick={() => setActiveTab("sellers")}
-                        className={`px-6 py-4 font-medium !rounded-button whitespace-nowrap ${
-                            activeTab === "sellers"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600"
-                        }`}
+                        className={`px-6 py-4 font-medium !rounded-button whitespace-nowrap ${activeTab === "sellers"
+                            ? "text-blue-600 border-b-2 border-blue-600"
+                            : "text-gray-600"
+                            }`}
                     >
                         판매자 랭킹
                     </button>
                     <button
                         onClick={() => setActiveTab("bidders")}
-                        className={`px-6 py-4 font-medium !rounded-button whitespace-nowrap ${
-                            activeTab === "bidders"
-                                ? "text-blue-600 border-b-2 border-blue-600"
-                                : "text-gray-600"
-                        }`}
+                        className={`px-6 py-4 font-medium !rounded-button whitespace-nowrap ${activeTab === "bidders"
+                            ? "text-blue-600 border-b-2 border-blue-600"
+                            : "text-gray-600"
+                            }`}
                     >
                         입찰자 랭킹
                     </button>
@@ -126,9 +126,9 @@ const ProductListByRank: React.FC = () => {
                                 className="block bg-white rounded-lg p-4 hover:shadow-md transition-shadow"
                             >
                                 <div className="flex items-center space-x-6">
-                  <span className="text-3xl font-bold text-gray-900 w-12">
-                    {item.rank}
-                  </span>
+                                    <span className="text-3xl font-bold text-gray-900 w-12">
+                                        {item.rank}
+                                    </span>
                                     <img
                                         src={item.image}
                                         alt=""
@@ -168,9 +168,9 @@ const ProductListByRank: React.FC = () => {
                                 className="block bg-white rounded-lg p-4 hover:shadow-md transition-shadow"
                             >
                                 <div className="flex items-center space-x-6">
-                  <span className="text-3xl font-bold text-gray-900 w-12">
-                    {item.rank}
-                  </span>
+                                    <span className="text-3xl font-bold text-gray-900 w-12">
+                                        {item.rank}
+                                    </span>
                                     <img
                                         src={item.image}
                                         alt=""
@@ -193,11 +193,10 @@ const ProductListByRank: React.FC = () => {
                                                     {[...Array(5)].map((_, index) => (
                                                         <i
                                                             key={index}
-                                                            className={`fas fa-star text-lg ${
-                                                                index < Math.floor(item.trustScore)
-                                                                    ? "text-yellow-400"
-                                                                    : "text-gray-300"
-                                                            }`}
+                                                            className={`fas fa-star text-lg ${index < Math.floor(item.trustScore)
+                                                                ? "text-yellow-400"
+                                                                : "text-gray-300"
+                                                                }`}
                                                         ></i>
                                                     ))}
                                                 </div>
@@ -219,9 +218,9 @@ const ProductListByRank: React.FC = () => {
                                 className="block bg-white rounded-lg p-4 hover:shadow-md transition-shadow"
                             >
                                 <div className="flex items-center space-x-6">
-                  <span className="text-3xl font-bold text-gray-900 w-12">
-                    {item.rank}
-                  </span>
+                                    <span className="text-3xl font-bold text-gray-900 w-12">
+                                        {item.rank}
+                                    </span>
                                     <img
                                         src={item.image}
                                         alt=""
@@ -255,4 +254,5 @@ const ProductListByRank: React.FC = () => {
         </div>
     );
 };
-export default ProductListByRank;
+
+export default Ranking;
