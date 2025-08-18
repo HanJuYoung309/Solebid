@@ -5,6 +5,7 @@ import com.sesac.solbid.domain.enums.UserStatus;
 import com.sesac.solbid.domain.enums.UserType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -43,6 +44,7 @@ public class User extends BaseEntity {
     private UserType userType;
 
     @Column(unique = true, nullable = false)
+    @ColumnDefault("36.5")
     private BigDecimal temperature;
 
     @Column(nullable = false)
@@ -75,6 +77,17 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Payments> payments = new ArrayList<>();
 
-
+    @Builder
+    public User(String email, String password, String nickname, String name, String phone) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.name = name;
+        this.phone = phone;
+        this.userType = UserType.USER;
+        this.temperature = new BigDecimal("36.5");
+        this.point = BigDecimal.ZERO;
+        this.userStatus = UserStatus.ACTIVE;
+    }
 
 }

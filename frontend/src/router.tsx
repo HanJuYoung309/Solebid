@@ -7,11 +7,15 @@ import BrandPage from './features/product/pages/BrandPage';
 import CategoryPage from './features/product/pages/CategoryPage';
 import RankingPage from './features/product/pages/RankingPage';
 import SearchPage from './features/product/pages/SearchPage';
+import Login from "./features/user/pages/Login.tsx";
+import Signup from "./features/user/pages/Signup.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route>
             <Route path="/" element={<MainPage />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/auction" element={<AuctionPage />} />
             <Route path="/auction/bid" element={<AuctionBidPage />} />
             <Route path="/category/:categoryName" element={<CategoryPage />} />

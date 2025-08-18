@@ -27,6 +27,7 @@ public class ProductRegisterController {
     {
         try {
             productService.registerProduct(dto, files);
+            System.out.println("success");
             return ResponseEntity.ok(Map.of("success", true));
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_UPLOAD_FAILED);
