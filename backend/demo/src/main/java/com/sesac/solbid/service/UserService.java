@@ -71,7 +71,10 @@ public class UserService {
 
     @Transactional
     public User saveOrUpdate(String providerName, Map<String, Object> userAttributes) {
-        ProviderType provider = ProviderType.valueOf(providerName.toUpperCase());
+        // Provider 이름을 적절한 형태로 변환 (첫 글자만 대문자)
+        String normalizedProviderName = providerName.substring(0, 1).toUpperCase() + providerName.substring(1).toLowerCase();
+        ProviderType provider = ProviderType.valueOf(normalizedProviderName);
+        
         String providerId = getProviderId(provider, userAttributes);
         String email = getEmail(provider, userAttributes);
         String nickname = getNickname(provider, userAttributes);
