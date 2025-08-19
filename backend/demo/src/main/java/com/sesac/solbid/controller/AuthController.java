@@ -3,6 +3,7 @@ package com.sesac.solbid.controller;
 import com.sesac.solbid.dto.ApiResponse;
 import com.sesac.solbid.dto.OAuth2Dto;
 import com.sesac.solbid.dto.UserDto;
+import com.sesac.solbid.exception.ErrorCode;
 import com.sesac.solbid.exception.OAuth2Exception;
 import com.sesac.solbid.service.OAuth2Service;
 import jakarta.servlet.http.Cookie;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 /**
  * OAuth2 소셜로그인 인증 컨트롤러
@@ -31,8 +34,8 @@ public class AuthController {
      * POST /api/auth/oauth2/logout
      */
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(HttpServletResponse response) {
-        
+    public ResponseEntity<ApiResponse<Object>> logout(HttpServletResponse response) {
+
         log.info("로그아웃 요청");
         
         try {
@@ -42,7 +45,7 @@ public class AuthController {
             log.info("로그아웃 완료");
             
             return ResponseEntity.ok(
-                ApiResponse.success("로그아웃이 완료되었습니다.", "로그아웃이 완료되었습니다.")
+                ApiResponse.success(Collections.emptyMap(), "로그아웃이 완료되었습니다.")
             );
             
         } catch (Exception e) {
@@ -246,7 +249,8 @@ public class AuthController {
         } catch (OAuth2Exception e) {
             log.warn("OAuth2 콜백 처리 실패: provider={}, clientIp={}, error={}, state={}", 
                     provider, clientIp, e.getMessage(), maskState(request.getState()));
-            return ResponseEntity.badRequest().body(
+            int status = (e.getErrorCode() == ErrorCode.SOCIAL_ACCOUNT_CONFLICT) ? 409 : 400;
+            return ResponseEntity.status(status).body(
                 ApiResponse.error(e.getErrorCode().name(), e.getMessage())
             );
         } catch (Exception e) {

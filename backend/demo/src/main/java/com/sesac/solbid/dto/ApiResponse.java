@@ -9,14 +9,14 @@ import lombok.Getter;
  */
 @Getter
 public class ApiResponse<T> {
-    private final boolean isSuccess;
+    private final boolean success;
     private final T data;
     private final String errorCode;
     private final String message;
 
     @Builder
-    public ApiResponse(boolean isSuccess, T data, String errorCode, String message) {
-        this.isSuccess = isSuccess;
+    public ApiResponse(boolean success, T data, String errorCode, String message) {
+        this.success = success;
         this.data = data;
         this.errorCode = errorCode;
         this.message = message;
@@ -27,7 +27,7 @@ public class ApiResponse<T> {
      */
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
-                .isSuccess(true)
+                .success(true)
                 .data(data)
                 .errorCode(null)
                 .message(null)
@@ -39,7 +39,7 @@ public class ApiResponse<T> {
      */
     public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
-                .isSuccess(true)
+                .success(true)
                 .data(data)
                 .errorCode(null)
                 .message(message)
@@ -51,7 +51,7 @@ public class ApiResponse<T> {
      */
     public static <T> ApiResponse<T> error(String errorCode, String message) {
         return ApiResponse.<T>builder()
-                .isSuccess(false)
+                .success(false)
                 .data(null)
                 .errorCode(errorCode)
                 .message(message)
@@ -63,7 +63,7 @@ public class ApiResponse<T> {
      */
     public static <T> ApiResponse<T> error(T data, String errorCode, String message) {
         return ApiResponse.<T>builder()
-                .isSuccess(false)
+                .success(false)
                 .data(data)
                 .errorCode(errorCode)
                 .message(message)
