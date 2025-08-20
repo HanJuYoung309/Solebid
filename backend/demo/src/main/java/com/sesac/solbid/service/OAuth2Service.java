@@ -102,6 +102,15 @@ public class OAuth2Service {
             String accessToken = getAccessToken(provider, authCode);
             Map<String, Object> userAttributes = getUserAttributes(provider, accessToken);
             
+            // 필수 사용자 정보 검증 (Google은 email 필수)
+            String regId = provider.getRegistrationId().toLowerCase();
+            if ("google".equals(regId)) {
+                Object emailObj = userAttributes.get("email");
+                if (emailObj == null || String.valueOf(emailObj).isBlank()) {
+                    throw new OAuth2Exception(ErrorCode.OAUTH2_USER_INFO_ERROR);
+                }
+            }
+
             // 사용자 정보 동기화 포함
             User user = userService.saveOrUpdate(providerName, userAttributes);
 

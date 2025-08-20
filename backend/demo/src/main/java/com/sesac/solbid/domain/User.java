@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="user")
+@Table(name="`user`")
 public class User extends BaseEntity {
 
     @Id
@@ -43,7 +43,7 @@ public class User extends BaseEntity {
     @Column(length = 20)
     private UserType userType;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @ColumnDefault("36.5")
     private BigDecimal temperature;
 
@@ -90,4 +90,10 @@ public class User extends BaseEntity {
         this.userStatus = UserStatus.ACTIVE;
     }
 
+    // 닉네임 동기화용 업데이트 메서드
+    public void updateNickname(String newNickname) {
+        if (newNickname != null && !newNickname.isBlank() && !newNickname.equals(this.nickname)) {
+            this.nickname = newNickname;
+        }
+    }
 }
