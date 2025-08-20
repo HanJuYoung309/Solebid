@@ -59,7 +59,7 @@ const Login: React.FC = () => {
             );
             const result = await response.json();
 
-            if (response.ok && result.is_success) {
+            if (response.ok && result.success) {
                 setErrors({});
                 // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
                 // 사용자 정보만 localStorage에 저장
@@ -70,7 +70,7 @@ const Login: React.FC = () => {
                 window.location.reload();
             } else {
                 setErrors({
-                    submit: result.error?.message || "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
+                    submit: result.message || "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
                 });
             }
         } catch (error) {
@@ -92,12 +92,12 @@ const Login: React.FC = () => {
             });
             const data = await response.json();
 
-            if (data.isSuccess) {
+            if (data.success) {
                 // 2. 소셜 플랫폼 인증 페이지로 이동
                 window.location.href = data.data.authUrl;
             } else {
                 setErrors({
-                    submit: `${provider} 로그인 URL 생성에 실패했습니다.`
+                    submit: data.message || `${provider} 로그인 URL 생성에 실패했습니다.`
                 });
                 setIsLoading(false);
             }

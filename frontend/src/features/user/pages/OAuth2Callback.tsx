@@ -33,7 +33,7 @@ const OAuth2Callback: React.FC = () => {
 
         const data = await response.json();
 
-        if (data.isSuccess) {
+        if (data.success) {
           // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
           // 사용자 정보만 localStorage에 저장
           localStorage.setItem('nickname', data.data.nickname);
