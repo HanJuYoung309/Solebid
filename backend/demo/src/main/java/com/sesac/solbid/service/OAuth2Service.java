@@ -70,24 +70,14 @@ public class OAuth2Service {
     public UserDto.LoginResponse processCallback(String providerName, String authCode, String state) {
         log.debug("OAuth2 콜백 처리 시작: provider={}", providerName);
         
-        try {
-            // State 검증
-            stateService.validateState(state);
-            
-            // 기존 로그인 로직 실행
-            UserDto.LoginResponse response = login(providerName, authCode);
-            
-            // State 삭제 (사용 후 즉시 삭제)
-            stateService.removeState(state);
-            
-            log.info("OAuth2 콜백 처리 완료: provider={}, userId={}", providerName, response.getUserId());
-            return response;
-            
-        } catch (Exception e) {
-            // State 삭제 (에러 발생 시에도 삭제)
-            stateService.removeState(state);
-            throw e;
-        }
+        // 동시 요청 방지를 위해 state를 검증과 동시에 소비(삭제)
+        stateService.consumeState(state);
+
+        // 기존 로그인 로직 실행
+        UserDto.LoginResponse response = login(providerName, authCode);
+
+        log.info("OAuth2 콜백 처리 완료: provider={}, userId={}", providerName, response.getUserId());
+        return response;
     }
 
     /**
@@ -124,8 +114,9 @@ public class OAuth2Service {
             return UserDto.LoginResponse.from(user, serviceAccessToken, serviceRefreshToken);
             
         } catch (WebClientResponseException e) {
-            log.error("OAuth2 통신 오류: provider={}, status={}, body={}", 
-                    providerName, e.getStatusCode(), maskSensitiveData(e.getResponseBodyAsString()));
+            log.error("OAuth2 통신 오류: provider={}, status={}, body=",
+                    providerName, e.getStatusCode());
+            log.error("{}", maskSensitiveData(e.getResponseBodyAsString()));
             throw new OAuth2Exception(ErrorCode.OAUTH2_TOKEN_ERROR);
         } catch (Exception e) {
             log.error("OAuth2 로그인 처리 중 오류 발생: provider={}", providerName, e);
@@ -186,8 +177,9 @@ public class OAuth2Service {
             return accessToken;
             
         } catch (WebClientResponseException e) {
-            log.error("OAuth2 토큰 요청 실패: provider={}, status={}, body={}", 
-                    provider.getRegistrationId(), e.getStatusCode(), maskSensitiveData(e.getResponseBodyAsString()));
+            log.error("OAuth2 토큰 요청 실패: provider={}, status={}, body=",
+                    provider.getRegistrationId(), e.getStatusCode());
+            log.error("{}", maskSensitiveData(e.getResponseBodyAsString()));
             throw new OAuth2Exception(ErrorCode.OAUTH2_TOKEN_ERROR);
         } catch (Exception e) {
             log.error("OAuth2 토큰 획득 중 예외 발생: provider={}", provider.getRegistrationId(), e);
@@ -218,8 +210,9 @@ public class OAuth2Service {
             return userAttributes;
             
         } catch (WebClientResponseException e) {
-            log.error("OAuth2 사용자 정보 요청 실패: provider={}, status={}, body={}", 
-                    provider.getRegistrationId(), e.getStatusCode(), maskSensitiveData(e.getResponseBodyAsString()));
+            log.error("OAuth2 사용자 정보 요청 실패: provider={}, status={}, body=",
+                    provider.getRegistrationId(), e.getStatusCode());
+            log.error("{}", maskSensitiveData(e.getResponseBodyAsString()));
             throw new OAuth2Exception(ErrorCode.OAUTH2_USER_INFO_ERROR);
         } catch (Exception e) {
             log.error("OAuth2 사용자 정보 획득 중 예외 발생: provider={}", provider.getRegistrationId(), e);

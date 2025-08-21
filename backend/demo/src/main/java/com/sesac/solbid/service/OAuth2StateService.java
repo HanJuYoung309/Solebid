@@ -70,6 +70,28 @@ public class OAuth2StateService {
     }
 
     /**
+     * state 파라미터 소비(검증+삭제) - 원자적 처리로 동시 요청 차단
+     * @param state 소비할 state 값
+     */
+    public void consumeState(String state) {
+        if (state == null || state.trim().isEmpty()) {
+            log.warn("OAuth2 state 소비 실패: state가 null 또는 빈 값");
+            throw new OAuth2StateException();
+        }
+        // remove는 기존 값을 반환하므로 검증과 삭제를 원자적으로 처리할 수 있음
+        StateInfo stateInfo = stateStore.remove(state);
+        if (stateInfo == null) {
+            log.warn("OAuth2 state 소비 실패: 존재하지 않거나 이미 소비된 state - {}", maskState(state));
+            throw new OAuth2StateException();
+        }
+        if (stateInfo.isExpired()) {
+            log.warn("OAuth2 state 소비 실패: 만료된 state - {} - 만료시간: {}", maskState(state), stateInfo.getExpiryTime());
+            throw new OAuth2StateException();
+        }
+        log.debug("OAuth2 state 소비 성공: {}", maskState(state));
+    }
+
+    /**
      * state 파라미터 삭제 (사용 후 즉시 삭제)
      * @param state 삭제할 state 값
      */

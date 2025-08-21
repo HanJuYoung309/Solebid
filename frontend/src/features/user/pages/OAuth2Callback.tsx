@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const OAuth2Callback: React.FC = () => {
@@ -6,9 +6,14 @@ const OAuth2Callback: React.FC = () => {
   const [message, setMessage] = useState('로그인 처리 중...');
   const navigate = useNavigate();
   const { provider } = useParams<{ provider: string }>();
+  const processedRef = useRef(false);
 
   useEffect(() => {
     (async () => {
+      // StrictMode 등으로 인한 중복 실행 가드
+      if (processedRef.current) return;
+      processedRef.current = true;
+
       try {
         // URL에서 code와 state 파라미터 추출
         const urlParams = new URLSearchParams(window.location.search);
@@ -18,6 +23,19 @@ const OAuth2Callback: React.FC = () => {
         if (!code || !state || !provider) {
           setStatus('error');
           setMessage('잘못된 요청입니다.');
+          return;
+        }
+
+        // 동일 state로의 중복 처리 방지 (새로고침/뒤로가기 대비)
+        const guardKey = `oauth2_callback_handled_${state}`;
+        if (sessionStorage.getItem(guardKey)) {
+          // 이미 처리된 콜백이면 메인으로 유도
+          setStatus('success');
+          setMessage('이미 로그인 처리가 완료되었습니다. 메인 페이지로 이동합니다.');
+          setTimeout(() => {
+            navigate('/');
+            window.location.replace('/');
+          }, 1000);
           return;
         }
 
@@ -34,6 +52,9 @@ const OAuth2Callback: React.FC = () => {
         const data = await response.json();
 
         if (data.success) {
+          // 중복 방지를 위해 처리 완료 플래그 저장
+          sessionStorage.setItem(guardKey, '1');
+
           // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
           // 사용자 정보만 localStorage에 저장
           localStorage.setItem('nickname', data.data.nickname);

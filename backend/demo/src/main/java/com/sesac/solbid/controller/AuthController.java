@@ -57,108 +57,6 @@ public class AuthController {
     }
 
     /**
-     * 클라이언트 IP 주소 추출 (프록시 고려)
-     */
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        
-        String xRealIp = request.getHeader("X-Real-IP");
-        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
-            return xRealIp;
-        }
-        
-        return request.getRemoteAddr();
-    }
-
-    /**
-     * User-Agent 마스킹 처리 (보안)
-     */
-    private String maskUserAgent(String userAgent) {
-        if (userAgent == null || userAgent.length() < 20) {
-            return "****";
-        }
-        return userAgent.substring(0, 10) + "****" + userAgent.substring(userAgent.length() - 6);
-    }
-
-    /**
-     * State 값 마스킹 처리 (보안)
-     */
-    private String maskState(String state) {
-        if (state == null || state.length() < 8) {
-            return "****";
-        }
-        return state.substring(0, 4) + "****" + state.substring(state.length() - 4);
-    }
-
-    /**
-     * HttpOnly 쿠키로 토큰 설정
-     */
-    private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
-        // Access Token 쿠키 설정
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true);  // JavaScript 접근 차단
-        accessTokenCookie.setSecure(false);   // 개발환경에서는 false, 운영환경에서는 true
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(3600);    // 1시간
-        response.addCookie(accessTokenCookie);
-        
-        // Refresh Token 쿠키 설정
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false);  // 개발환경에서는 false, 운영환경에서는 true
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(86400);  // 24시간
-        response.addCookie(refreshTokenCookie);
-        
-        log.debug("HttpOnly 쿠키 설정 완료: accessToken({}초), refreshToken({}초)", 3600, 86400);
-    }
-
-    /**
-     * 토큰 쿠키 삭제 (로그아웃)
-     */
-    private void clearTokenCookies(HttpServletResponse response) {
-        // Access Token 쿠키 삭제
-        Cookie accessTokenCookie = new Cookie("accessToken", "");
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(false);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(0);  // 즉시 만료
-        response.addCookie(accessTokenCookie);
-        
-        // Refresh Token 쿠키 삭제
-        Cookie refreshTokenCookie = new Cookie("refreshToken", "");
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(false);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(0);  // 즉시 만료
-        response.addCookie(refreshTokenCookie);
-        
-        log.debug("HttpOnly 쿠키 삭제 완료");
-    }
-
-    /**
-     * 이메일 마스킹 처리 (보안)
-     */
-    private String maskEmail(String email) {
-        if (email == null || !email.contains("@")) {
-            return "****";
-        }
-        
-        String[] parts = email.split("@");
-        String localPart = parts[0];
-        String domain = parts[1];
-        
-        if (localPart.length() <= 2) {
-            return "**@" + domain;
-        }
-        
-        return localPart.substring(0, 2) + "****@" + domain;
-    }
-
-    /**
      * OAuth2 인증 URL 생성
      * GET /api/auth/oauth2/{provider}/url
      * 
@@ -262,5 +160,105 @@ public class AuthController {
         }
     }
 
+    /**
+     * 클라이언트 IP 주소 추출 (프록시 고려)
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            return xForwardedFor.split(",")[0].trim();
+        }
 
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
+            return xRealIp;
+        }
+
+        return request.getRemoteAddr();
+    }
+
+    /**
+     * User-Agent 마스킹 처리 (보안)
+     */
+    private String maskUserAgent(String userAgent) {
+        if (userAgent == null || userAgent.length() < 20) {
+            return "****";
+        }
+        return userAgent.substring(0, 10) + "****" + userAgent.substring(userAgent.length() - 6);
+    }
+
+    /**
+     * State 값 마스킹 처리 (보안)
+     */
+    private String maskState(String state) {
+        if (state == null || state.length() < 8) {
+            return "****";
+        }
+        return state.substring(0, 4) + "****" + state.substring(state.length() - 4);
+    }
+
+    /**
+     * HttpOnly 쿠키로 토큰 설정
+     */
+    private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        // Access Token 쿠키 설정
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true);  // JavaScript 접근 차단
+        accessTokenCookie.setSecure(false);   // 개발환경에서는 false, 운영환경에서는 true
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(3600);    // 1시간
+        response.addCookie(accessTokenCookie);
+
+        // Refresh Token 쿠키 설정
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);  // 개발환경에서는 false, 운영환경에서는 true
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(86400);  // 24시간
+        response.addCookie(refreshTokenCookie);
+
+        log.debug("HttpOnly 쿠키 설정 완료: accessToken({}초), refreshToken({}초)", 3600, 86400);
+    }
+
+    /**
+     * 토큰 쿠키 삭제 (로그아웃)
+     */
+    private void clearTokenCookies(HttpServletResponse response) {
+        // Access Token 쿠키 삭제
+        Cookie accessTokenCookie = new Cookie("accessToken", "");
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(false);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(0);  // 즉시 만료
+        response.addCookie(accessTokenCookie);
+
+        // Refresh Token 쿠키 삭제
+        Cookie refreshTokenCookie = new Cookie("refreshToken", "");
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setMaxAge(0);  // 즉시 만료
+        response.addCookie(refreshTokenCookie);
+
+        log.debug("HttpOnly 쿠키 삭제 완료");
+    }
+
+    /**
+     * 이메일 마스킹 처리 (보안)
+     */
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "****";
+        }
+
+        String[] parts = email.split("@");
+        String localPart = parts[0];
+        String domain = parts[1];
+
+        if (localPart.length() <= 2) {
+            return "**@" + domain;
+        }
+
+        return localPart.substring(0, 2) + "****@" + domain;
+    }
 }

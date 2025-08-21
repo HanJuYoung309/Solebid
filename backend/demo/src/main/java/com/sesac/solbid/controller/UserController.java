@@ -2,6 +2,7 @@ package com.sesac.solbid.controller;
 
 import com.sesac.solbid.domain.User;
 import com.sesac.solbid.dto.UserDto;
+import com.sesac.solbid.dto.ApiResponse;
 
 import com.sesac.solbid.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -27,21 +28,17 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<Map<String, Object>> signup(@Valid @RequestBody UserDto.SignupRequest requestDto) {
+    public ResponseEntity<ApiResponse<UserDto.SignupResponse>> signup(@Valid @RequestBody UserDto.SignupRequest requestDto) {
         User user = userService.signup(requestDto);
         UserDto.SignupResponse responseDto = new UserDto.SignupResponse(user);
 
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("is_success", true);
-        responseBody.put("data", responseDto);
-        responseBody.put("errorCode", null);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(responseDto));
     }
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(
             @Valid @RequestBody UserDto.LoginRequest requestDto,
             HttpServletResponse response) {
         
@@ -57,12 +54,7 @@ public class UserController {
         userData.put("nickname", responseDto.getNickname());
         userData.put("userType", responseDto.getUserType());
 
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("is_success", true);
-        responseBody.put("data", userData);
-        responseBody.put("errorCode", null);
-
-        return ResponseEntity.ok(responseBody);
+        return ResponseEntity.ok(ApiResponse.success(userData));
     }
 
     /**

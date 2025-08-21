@@ -9,6 +9,7 @@ import RankingPage from './features/product/pages/RankingPage';
 import SearchPage from './features/product/pages/SearchPage';
 import Login from "./features/user/pages/Login.tsx";
 import Signup from "./features/user/pages/Signup.tsx";
+import OAuth2Callback from "./features/user/pages/OAuth2Callback.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -16,6 +17,7 @@ const router = createBrowserRouter(
             <Route path="/" element={<MainPage />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback/:provider" element={<OAuth2Callback />} />
             <Route path="/auction" element={<AuctionPage />} />
             <Route path="/auction/bid" element={<AuctionBidPage />} />
             <Route path="/category/:categoryName" element={<CategoryPage />} />
