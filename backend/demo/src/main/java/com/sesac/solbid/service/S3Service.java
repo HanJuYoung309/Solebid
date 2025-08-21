@@ -25,7 +25,7 @@ public class S3Service {
     private String bucket;
 
     private final S3Client s3Client = S3Client.builder()
-            .region(Region.AP_NORTHEAST_2)
+            .region(Region.AP_SOUTHEAST_2)
             .build();
 
     public String upload(MultipartFile file) throws IOException {
@@ -41,7 +41,7 @@ public class S3Service {
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize())
         );
 
-        return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + fileName;
+        return "https://" + bucket + ".s3.ap-southeast-2.amazonaws.com/" + fileName;
     }
 
     public MultipartFile download(String fileName) throws IOException {
@@ -50,12 +50,13 @@ public class S3Service {
                 .key(fileName)
                 .build();
 
-        ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getObjectRequest);
+        ResponseBytes<GetObjectResponse> objectBytes =
+                s3Client.getObjectAsBytes(getObjectRequest);
 
         return new S3MultipartFile(
-                objectBytes.asByteArray(),                          // byte[]
-                fileName,                                           // original filename
-                objectBytes.response().contentType()               // content-type
+                objectBytes.asByteArray(), // byte[]
+                fileName, // original filename
+                objectBytes.response().contentType() // content-type
         );
     }
 }
