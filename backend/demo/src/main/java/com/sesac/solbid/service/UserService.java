@@ -132,7 +132,7 @@ public class UserService {
                         .build();
                 socialLoginRepository.save(socialLogin);
             } else {
-                // 새로운 유저 생성 시, provider가 준 display name을 name 필드에 저장
+                // 새로운 유저 생성 시, provider가 준 display name을 name 컬럼에 저장
                 // nickname 은 임시값(고유)으로 생성하여 저장하고, 이후 사용자 입력으로 변경하도록 유도
                 String tempNickname = generateTemporaryNickname();
                 user = User.builder()

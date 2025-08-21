@@ -89,7 +89,7 @@ class UserServiceSocialLoginTest {
         kakaoUserAttributes.put("kakao_account", kakaoAccount);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("nickname", "카카오사용자");
+        properties.put("nickname", "Kakao User");
         kakaoUserAttributes.put("properties", properties);
     }
 
@@ -169,7 +169,7 @@ class UserServiceSocialLoginTest {
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("google@example.com") &&
             user.getNickname().startsWith("user_") &&
-            user.getName().equals("Google User") &&
+            "Google User".equals(user.getName()) &&
             user.getPassword() == null &&
             user.getPhone() == null
         ));
@@ -198,7 +198,7 @@ class UserServiceSocialLoginTest {
         // Then
         assertThat(result.getEmail()).isEqualTo("kakao@example.com");
         assertThat(result.getNickname()).startsWith("user_"); // 임시 닉네임
-        assertThat(result.getName()).isEqualTo("카카오사용자");
+        assertThat(result.getName()).isEqualTo("Kakao User");
 
         verify(socialLoginRepository).findByProviderAndProviderId(ProviderType.Kakao, "12345");
         verify(userRepository).findByEmail("kakao@example.com");
@@ -224,7 +224,7 @@ class UserServiceSocialLoginTest {
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("google@example.com") &&
             user.getNickname().startsWith("user_") &&
-            user.getName().equals("Google User")
+            "Google User".equals(user.getName())
         ));
         verify(socialLoginRepository).save(argThat(socialLogin ->
             socialLogin.getProvider() == ProviderType.Google &&
@@ -250,7 +250,7 @@ class UserServiceSocialLoginTest {
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("kakao@example.com") &&
             user.getNickname().startsWith("user_") &&
-            user.getName().equals("카카오사용자")
+            "Kakao User".equals(user.getName())
         ));
         verify(socialLoginRepository).save(argThat(socialLogin ->
             socialLogin.getProvider() == ProviderType.Kakao &&
@@ -364,7 +364,7 @@ class UserServiceSocialLoginTest {
         kakaoAttributesWithIntId.put("kakao_account", kakaoAccount);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("nickname", "카카오사용자");
+        properties.put("nickname", "Kakao User");
         kakaoAttributesWithIntId.put("properties", properties);
 
         when(socialLoginRepository.findByProviderAndProviderId(ProviderType.Kakao, "12345"))
@@ -502,7 +502,7 @@ class UserServiceSocialLoginTest {
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("google@example.com") &&
             user.getNickname().startsWith("user_") &&
-            user.getName().equals("Google User")
+            "Google User".equals(user.getName())
         ));
     }
 
@@ -534,7 +534,7 @@ class UserServiceSocialLoginTest {
         kakaoAttributesWithoutEmail.put("kakao_account", kakaoAccount);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("nickname", "카카오사용자");
+        properties.put("nickname", "Kakao User");
         kakaoAttributesWithoutEmail.put("properties", properties);
 
         when(socialLoginRepository.findByProviderAndProviderId(ProviderType.Kakao, "12345"))

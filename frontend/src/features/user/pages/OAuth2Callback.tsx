@@ -57,17 +57,22 @@ const OAuth2Callback: React.FC = () => {
 
           // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
           // 사용자 정보만 localStorage에 저장
-          localStorage.setItem('nickname', data.data.nickname);
-          localStorage.setItem('userId', data.data.userId.toString());
-          
+          if (data.data?.nickname) localStorage.setItem('nickname', data.data.nickname);
+          if (data.data?.userId) localStorage.setItem('userId', data.data.userId.toString());
+
           setStatus('success');
-          setMessage('로그인이 완료되었습니다. 잠시 후 메인 페이지로 이동합니다.');
-          
-          // 2초 후 메인 페이지로 이동
+          setMessage('로그인이 완료되었습니다. 잠시 후 이동합니다.');
+
+          // 닉네임 필요 시 닉네임 설정 페이지로 유도
+          const requiresNickname: boolean = Boolean(data.data?.requiresNickname);
           setTimeout(() => {
-            navigate('/');
-            window.location.reload();
-          }, 2000);
+            if (requiresNickname) {
+              navigate('/nickname-setup');
+            } else {
+              navigate('/');
+              window.location.reload();
+            }
+          }, 1000);
         } else {
           setStatus('error');
           setMessage(data.message || '로그인에 실패했습니다.');
