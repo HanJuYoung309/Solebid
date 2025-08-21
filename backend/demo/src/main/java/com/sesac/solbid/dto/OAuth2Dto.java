@@ -70,15 +70,17 @@ public class OAuth2Dto {
         private final String nickname;
         private final String userType;
         private final String provider;
+        private final boolean requiresNickname;
 
         @Builder
         public LoginSuccessResponse(Long userId, String email, String nickname, 
-                                  Object userType, String provider) {
+                                  Object userType, String provider, boolean requiresNickname) {
             this.userId = userId;
             this.email = email;
             this.nickname = nickname;
             this.userType = userType != null ? userType.toString() : null;
             this.provider = provider;
+            this.requiresNickname = requiresNickname;
         }
     }
 }

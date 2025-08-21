@@ -69,15 +69,14 @@ public class OAuth2Service {
     @Transactional
     public UserDto.LoginResponse processCallback(String providerName, String authCode, String state) {
         log.debug("OAuth2 콜백 처리 시작: provider={}", providerName);
-        
-        // 동시 요청 방지를 위해 state를 검증과 동시에 소비(삭제)
-        stateService.consumeState(state);
-
-        // 기존 로그인 로직 실행
-        UserDto.LoginResponse response = login(providerName, authCode);
-
-        log.info("OAuth2 콜백 처리 완료: provider={}, userId={}", providerName, response.getUserId());
-        return response;
+        try {
+            stateService.validateState(state);
+            UserDto.LoginResponse response = login(providerName, authCode);
+            log.info("OAuth2 콜백 처리 완료: provider={}, userId={}", providerName, response.getUserId());
+            return response;
+        } finally {
+            stateService.removeState(state);
+        }
     }
 
     /**

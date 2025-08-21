@@ -220,8 +220,9 @@ class OAuth2EndToEndIntegrationTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("소셜로그인이 완료되었습니다."))
                 .andExpect(jsonPath("$.data.email").value("newuser@gmail.com"))
-                .andExpect(jsonPath("$.data.nickname").value("구글 신규사용자"))
+                .andExpect(jsonPath("$.data.nickname").value(org.hamcrest.Matchers.startsWith("user_")))
                 .andExpect(jsonPath("$.data.userType").value("USER"))
+                .andExpect(jsonPath("$.data.requiresNickname").value(true))
                 .andExpect(cookie().exists("accessToken"))
                 .andExpect(cookie().exists("refreshToken"))
                 .andReturn();
@@ -230,7 +231,7 @@ class OAuth2EndToEndIntegrationTest {
         // 사용자가 생성되었는지 확인
         User createdUser = userRepository.findByEmail("newuser@gmail.com").orElse(null);
         assertThat(createdUser).isNotNull();
-        assertThat(createdUser.getNickname()).isEqualTo("구글 신규사용자");
+        assertThat(createdUser.getNickname()).startsWith("user_");
         assertThat(createdUser.getUserType()).isEqualTo(UserType.USER);
 
         // 소셜 로그인 정보가 저장되었는지 확인
@@ -322,14 +323,14 @@ class OAuth2EndToEndIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.email").value("existing@gmail.com"))
-                .andExpect(jsonPath("$.data.nickname").value("업데이트된 구글사용자")) // 업데이트된 닉네임
+                .andExpect(jsonPath("$.data.nickname").value("기존사용자"))
                 .andExpect(cookie().exists("accessToken"));
 
         // === 4단계: 사용자 정보 동기화 검증 ===
         User updatedUser = userRepository.findByEmail("existing@gmail.com").orElse(null);
         assertThat(updatedUser).isNotNull();
-        assertThat(updatedUser.getNickname()).isEqualTo("업데이트된 구글사용자"); // 닉네임이 업데이트되었는지 확인
-        assertThat(updatedUser.getUserId()).isEqualTo(existingUser.getUserId()); // 동일한 사용자인지 확인
+        assertThat(updatedUser.getNickname()).isEqualTo("기존사용자");
+        assertThat(updatedUser.getUserId()).isEqualTo(existingUser.getUserId());
     }
 
     // === Kakao OAuth2 전체 플로우 테스트 ===
@@ -399,13 +400,14 @@ class OAuth2EndToEndIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.email").value("newuser@kakao.com"))
-                .andExpect(jsonPath("$.data.nickname").value("카카오 신규사용자"))
+                .andExpect(jsonPath("$.data.nickname").value(org.hamcrest.Matchers.startsWith("user_")))
+                .andExpect(jsonPath("$.data.requiresNickname").value(true))
                 .andExpect(cookie().exists("accessToken"));
 
         // === 4단계: 데이터베이스 검증 ===
         User createdUser = userRepository.findByEmail("newuser@kakao.com").orElse(null);
         assertThat(createdUser).isNotNull();
-        assertThat(createdUser.getNickname()).isEqualTo("카카오 신규사용자");
+        assertThat(createdUser.getNickname()).startsWith("user_");
 
         var socialLogin = socialLoginRepository.findByProviderAndProviderId(ProviderType.Kakao, "987654321");
         assertThat(socialLogin).isPresent();

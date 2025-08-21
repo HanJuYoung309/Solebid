@@ -159,7 +159,7 @@ class UserServiceSocialLoginTest {
 
         // Then
         assertThat(result.getEmail()).isEqualTo("google@example.com");
-        assertThat(result.getNickname()).isEqualTo("Google User");
+        assertThat(result.getNickname()).startsWith("user_"); // 임시 닉네임
         assertThat(result.getName()).isEqualTo("Google User");
         assertThat(result.getPassword()).isNull();
         assertThat(result.getPhone()).isNull();
@@ -168,7 +168,7 @@ class UserServiceSocialLoginTest {
         verify(userRepository).findByEmail("google@example.com");
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("google@example.com") &&
-            user.getNickname().equals("Google User") &&
+            user.getNickname().startsWith("user_") &&
             user.getName().equals("Google User") &&
             user.getPassword() == null &&
             user.getPhone() == null
@@ -197,7 +197,7 @@ class UserServiceSocialLoginTest {
 
         // Then
         assertThat(result.getEmail()).isEqualTo("kakao@example.com");
-        assertThat(result.getNickname()).isEqualTo("카카오사용자");
+        assertThat(result.getNickname()).startsWith("user_"); // 임시 닉네임
         assertThat(result.getName()).isEqualTo("카카오사용자");
 
         verify(socialLoginRepository).findByProviderAndProviderId(ProviderType.Kakao, "12345");
@@ -223,7 +223,7 @@ class UserServiceSocialLoginTest {
         // Then
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("google@example.com") &&
-            user.getNickname().equals("Google User") &&
+            user.getNickname().startsWith("user_") &&
             user.getName().equals("Google User")
         ));
         verify(socialLoginRepository).save(argThat(socialLogin ->
@@ -249,7 +249,7 @@ class UserServiceSocialLoginTest {
         // Then
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("kakao@example.com") &&
-            user.getNickname().equals("카카오사용자") &&
+            user.getNickname().startsWith("user_") &&
             user.getName().equals("카카오사용자")
         ));
         verify(socialLoginRepository).save(argThat(socialLogin ->
@@ -479,7 +479,7 @@ class UserServiceSocialLoginTest {
         // Given
         User newUser = User.builder()
                 .email("google@example.com")
-                .nickname("Google User")
+                .nickname("user_temp")
                 .name("Google User")
                 .password(null)
                 .phone(null)
@@ -501,7 +501,7 @@ class UserServiceSocialLoginTest {
         // Then
         verify(userRepository).save(argThat(user ->
             user.getEmail().equals("google@example.com") &&
-            user.getNickname().equals("Google User") &&
+            user.getNickname().startsWith("user_") &&
             user.getName().equals("Google User")
         ));
     }

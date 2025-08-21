@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +71,27 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. id=" + userId));
     }
 
+    // 닉네임 가용성 확인
+    public boolean isNicknameAvailable(String nickname) {
+        if (nickname == null || nickname.isBlank()) return false;
+        if (nickname.length() < 2 || nickname.length() > 10) return false;
+        // 임시 접두 사용 방지 권장
+        if (nickname.startsWith("user_")) return false;
+        return userRepository.findByNickname(nickname).isEmpty();
+    }
+
+    // 이메일 기준으로 닉네임 변경
+    @Transactional
+    public User updateNicknameForEmail(String email, String newNickname) {
+        if (!isNicknameAvailable(newNickname)) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAILED));
+        user.updateNickname(newNickname);
+        return user;
+    }
+
     @Transactional
     public User saveOrUpdate(String providerName, Map<String, Object> userAttributes) {
         // Provider 이름을 적절한 형태로 변환 (첫 글자만 대문자)
@@ -78,16 +100,20 @@ public class UserService {
         
         String providerId = getProviderId(provider, userAttributes);
         String email = getEmail(provider, userAttributes);
-        String nickname = getNickname(provider, userAttributes);
+        // provider가 제공하는 이름은 name 으로만 사용하고, nickname 은 사용자가 직접 설정하도록 유도
+        String displayName = getDisplayName(provider, userAttributes);
 
         Optional<SocialLogin> socialLoginOptional = socialLoginRepository.findByProviderAndProviderId(provider, providerId);
 
         User user;
         if (socialLoginOptional.isPresent()) {
-            // 기존 소셜 로그인 사용자: 이메일이 일치할 때만 닉네임 동기화(저장은 하지 않음)
+            // 기존 소셜 로그인 사용자: 닉네임은 자동 동기화하지 않음
             user = socialLoginOptional.get().getUser();
-            if (email != null && email.equals(user.getEmail())) {
-                user.updateNickname(nickname);
+            // 사용자의 name 은 비어있을 때만 보수적으로 채움
+            if (user.getName() == null || user.getName().isBlank()) {
+                if (displayName != null && !displayName.isBlank()) {
+                    // 엔티티에 name setter가 없으므로 신규 생성 외에는 유지
+                }
             }
         } else {
             Optional<User> userOptional = userRepository.findByEmail(email);
@@ -106,12 +132,14 @@ public class UserService {
                         .build();
                 socialLoginRepository.save(socialLogin);
             } else {
-                // 새로운 유저 생성 시, name 필드를 nickname으로 설정 (email/nickname이 null일 수 있음)
+                // 새로운 유저 생성 시, provider가 준 display name을 name 필드에 저장
+                // nickname 은 임시값(고유)으로 생성하여 저장하고, 이후 사용자 입력으로 변경하도록 유도
+                String tempNickname = generateTemporaryNickname();
                 user = User.builder()
                         .email(email)
                         .password(null)
-                        .nickname(nickname)
-                        .name(nickname)
+                        .nickname(tempNickname)
+                        .name(displayName)
                         .phone(null)
                         .build();
                 userRepository.save(user);
@@ -154,28 +182,51 @@ public class UserService {
         throw new IllegalArgumentException("Unsupported Provider: " + provider);
     }
 
-    private String getNickname(ProviderType provider, Map<String, Object> attributes) {
+    // provider가 제공하는 이름 (표시용)
+    private String getDisplayName(ProviderType provider, Map<String, Object> attributes) {
         if (provider == ProviderType.Google) {
-            return (String) attributes.get("name");
+            // Google은 일반적으로 "name"(full name) 또는 "given_name" 등을 제공
+            String name = (String) attributes.get("name");
+            if (name != null && !name.isBlank()) return name;
+            String given = (String) attributes.get("given_name");
+            if (given != null && !given.isBlank()) return given;
+            return (String) attributes.get("email");
         }
         if (provider == ProviderType.Kakao) {
-            // kakao_account.profile.nickname 우선, 없으면 properties.nickname 사용
             Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
             if (kakaoAccount != null) {
                 Object profileObj = kakaoAccount.get("profile");
                 if (profileObj instanceof Map<?, ?> profile) {
                     Object nickname = profile.get("nickname");
-                    if (nickname != null) {
-                        return String.valueOf(nickname);
-                    }
+                    if (nickname != null) return String.valueOf(nickname);
                 }
             }
             Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
             if (properties != null) {
-                return (String) properties.get("nickname");
+                Object nickname = properties.get("nickname");
+                if (nickname != null) return String.valueOf(nickname);
             }
-            return null;
+            return (kakaoAccount != null) ? (String) kakaoAccount.get("email") : null;
         }
         throw new IllegalArgumentException("Unsupported Provider: " + provider);
+    }
+
+    // 임시 닉네임 생성: user_ + 10자리 영소문자/숫자, 중복 회피
+    private String generateTemporaryNickname() {
+        final String prefix = "user_";
+        final String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        Random rnd = new Random();
+        for (int attempt = 0; attempt < 10; attempt++) {
+            StringBuilder sb = new StringBuilder(prefix);
+            for (int i = 0; i < 10; i++) {
+                sb.append(chars.charAt(rnd.nextInt(chars.length())));
+            }
+            String candidate = sb.toString();
+            if (userRepository.findByNickname(candidate).isEmpty()) {
+                return candidate;
+            }
+        }
+        // 매우 드문 경우, UUID 일부 사용
+        return prefix + Long.toHexString(System.nanoTime());
     }
 }

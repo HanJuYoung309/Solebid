@@ -128,6 +128,9 @@ public class AuthController {
             // HttpOnly 쿠키로 토큰 설정
             setTokenCookies(httpResponse, response.getAccessToken(), response.getRefreshToken());
             
+            // 임시 닉네임인지 여부 판단 (user_ 접두어)
+            boolean requiresNickname = response.getNickname() != null && response.getNickname().startsWith("user_");
+
             // 응답에서는 토큰 제외하고 사용자 정보만 반환
             OAuth2Dto.LoginSuccessResponse loginSuccessResponse = OAuth2Dto.LoginSuccessResponse.builder()
                     .userId(response.getUserId())
@@ -135,6 +138,7 @@ public class AuthController {
                     .nickname(response.getNickname())
                     .userType(response.getUserType())
                     .provider(provider)
+                    .requiresNickname(requiresNickname)
                     .build();
             
             log.info("OAuth2 콜백 처리 성공: provider={}, clientIp={}, userId={}, email={}", 
