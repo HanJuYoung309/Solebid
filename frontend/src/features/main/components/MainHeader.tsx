@@ -11,13 +11,15 @@ function MainHeader() {
 
     useEffect(() => {
         const checkLoginStatus = () => {
-            const token = localStorage.getItem('accessToken');
+            // Login.tsx 정책: 토큰은 HttpOnly 쿠키, 사용자 정보(nickname, userId)만 localStorage 저장
             const nickname = localStorage.getItem('nickname');
-            if (token && nickname) {
+            const userId = localStorage.getItem('userId');
+            if (nickname && userId) {
                 setIsLoggedIn(true);
                 setUserProfile({ name: nickname });
             } else {
                 setIsLoggedIn(false);
+                setUserProfile({ name: "사용자" });
             }
         };
 
@@ -29,13 +31,28 @@ function MainHeader() {
         };
     }, []);
 
-    const handleLogout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('nickname');
-        setIsLoggedIn(false);
-        setShowProfileMenu(false);
-        navigate('/');
+    const handleLogout = async () => {
+        try {
+            // 서버에 로그아웃 요청하여 HttpOnly 쿠키 제거
+            await fetch('/api/auth/oauth2/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+            });
+        } catch (e) {
+            // 네트워크 오류 시에도 클라이언트 측 상태는 정리
+            console.error('logout error', e);
+        } finally {
+            // Login.tsx 저장 방식에 맞춰 정리
+            localStorage.removeItem('nickname');
+            localStorage.removeItem('userId');
+
+            setIsLoggedIn(false);
+            setShowProfileMenu(false);
+            navigate('/');
+            // 새 쿠키 상태 반영을 위해 새로고침
+            window.location.reload();
+        }
     };
 
     useEffect(() => {

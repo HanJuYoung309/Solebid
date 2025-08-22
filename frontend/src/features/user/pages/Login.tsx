@@ -53,28 +53,59 @@ const Login: React.FC = () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
+                    credentials: 'include', // 쿠키 포함
                     body: JSON.stringify(loginForm),
                 },
             );
             const result = await response.json();
 
-            if (response.ok && result.is_success) {
+            if (response.ok && result.success) {
                 setErrors({});
-                localStorage.setItem('accessToken', result.data.accessToken);
-                localStorage.setItem('refreshToken', result.data.refreshToken);
+                // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
+                // 사용자 정보만 localStorage에 저장
                 localStorage.setItem('nickname', result.data.nickname);
+                localStorage.setItem('userId', result.data.userId.toString());
 
                 navigate("/");
                 window.location.reload();
             } else {
                 setErrors({
-                    submit: result.error?.message || "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
+                    submit: result.message || "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
                 });
             }
         } catch (error) {
             console.error("Login error:", error);
             setErrors({ submit: "네트워크 오류가 발생했습니다. 다시 시도해주세요." });
         } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 소셜 로그인 처리
+    const handleSocialLogin = async (provider: 'google' | 'kakao') => {
+        try {
+            setIsLoading(true);
+
+            // 1. OAuth2 인증 URL 요청
+            const response = await fetch(`/api/auth/oauth2/${provider}/url`, {
+                credentials: 'include' // 쿠키 포함
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                // 2. 소셜 플랫폼 인증 페이지로 이동
+                window.location.href = data.data.authUrl;
+            } else {
+                setErrors({
+                    submit: data.message || `${provider} 로그인 URL 생성에 실패했습니다.`
+                });
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error(`${provider} 로그인 오류:`, error);
+            setErrors({
+                submit: `${provider} 로그인 중 오류가 발생했습니다.`
+            });
             setIsLoading(false);
         }
     };
@@ -181,14 +212,18 @@ const Login: React.FC = () => {
                     <div className="space-y-3">
                         <button
                             type="button"
-                            className="w-full py-3 bg-[#FEE500] text-gray-900 font-medium !rounded-button hover:bg-[#FDD800] cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
+                            onClick={() => handleSocialLogin('kakao')}
+                            disabled={isLoading}
+                            className="w-full py-3 bg-[#FEE500] text-gray-900 font-medium !rounded-button hover:bg-[#FDD800] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
                         >
                             <i className="fas fa-comment mr-2"></i>
-                            카카오 로그인
+                            {isLoading ? '처리 중...' : '카카오 로그인'}
                         </button>
                         <button
                             type="button"
-                            className="w-full py-3 bg-white border border-gray-300 text-gray-700 font-medium !rounded-button hover:bg-gray-50 cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
+                            onClick={() => handleSocialLogin('google')}
+                            disabled={isLoading}
+                            className="w-full py-3 bg-white border border-gray-300 text-gray-700 font-medium !rounded-button hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors"
                         >
                             <i
                                 className="fab fa-google mr-2"
@@ -199,7 +234,7 @@ const Login: React.FC = () => {
                                     WebkitTextFillColor: "transparent",
                                 }}
                             ></i>
-                            구글 로그인
+                            {isLoading ? '처리 중...' : '구글 로그인'}
                         </button>
                     </div>
                     <div className="text-center mt-8 pt-6 border-t border-gray-200">

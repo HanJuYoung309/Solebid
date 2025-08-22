@@ -1,12 +1,12 @@
 package com.sesac.solbid.exception;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.sesac.solbid.dto.ApiResponse;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,70 +17,69 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /// 기본적으로 spring이 잡아주는 익셉션
+    // 표준 스키마: { success, errorCode, message, data }
+
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException e) {
-        return buildErrorResponse("매개변수 값이 잘못되었습니다: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("INVALID_PARAMETER", "매개변수 값이 잘못되었습니다: " + e.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException e) {
-        return buildErrorResponse("DB 제약조건 위반: " + e.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(DataIntegrityViolationException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error("DB_CONSTRAINT_VIOLATION", "DB 제약조건 위반: " + e.getMessage()));
     }
 
     @ExceptionHandler(TransactionSystemException.class)
-    public ResponseEntity<Map<String, Object>> handleTransaction(TransactionSystemException e) {
-        return buildErrorResponse("트랜잭션 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ApiResponse<Void>> handleTransaction(TransactionSystemException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("TRANSACTION_FAILED", "트랜잭션 실패: " + e.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, Object>> handleHttpMessage(HttpMessageNotReadableException e) {
-        return buildErrorResponse("요청 값이 잘못되었습니다: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessage(HttpMessageNotReadableException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("INVALID_INPUT_VALUE", "요청 값이 잘못되었습니다: " + e.getMessage()));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnsupportedMediaType(HttpMediaTypeNotSupportedException e) {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .body(ApiResponse.error("UNSUPPORTED_MEDIA_TYPE", e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
-        return buildErrorResponse("요청 파라미터 타입이 잘못되었습니다: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("PARAMETER_TYPE_MISMATCH", "요청 파라미터 타입이 잘못되었습니다: " + e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException e) {
+    public ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException e) {
         String errorMessage = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .map(error -> error.getDefaultMessage())
                 .findFirst()
                 .orElse("유효성 검사 실패");
-        return buildErrorResponse("유효성 검사 오류: " + errorMessage, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("INVALID_INPUT_VALUE", errorMessage));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleAll(HttpServletRequest request, Exception e) throws Exception {
+    public ResponseEntity<ApiResponse<Void>> handleAll(HttpServletRequest request, Exception e) throws Exception {
         String uri = request.getRequestURI();
         if (uri.startsWith("/files/")) {
             throw e;
         }
-        return buildErrorResponse("서버 내부 오류: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다."));
     }
 
-    /// 우리가 수동으로 던지는 익셉션
-    /// @GetMapping("/test")
-    /// public String test() {
-    ///     throw new CustomException(ErrorCode.DUPLICATE_RESOURCE); }
-
+    // 커스텀 예외
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<Map<String, Object>> handleCustomException(CustomException e) {
+    public ResponseEntity<ApiResponse<Void>> handleCustomException(CustomException e) {
         ErrorCode code = e.getErrorCode();
-        Map<String, Object> body = new HashMap<>();
-        body.put("success", false);
-        body.put("message", code.getMessage());
-        body.put("code", code.getStatus());
-        return ResponseEntity.status(code.getStatus()).body(body);
-    }
-
-    private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("success", false);
-        body.put("message", message);
-        body.put("code", status.getCode());
-        return ResponseEntity.status(status.getCode()).body(body);
+        return ResponseEntity.status(code.getStatus())
+                .body(ApiResponse.error(code.name(), code.getMessage()));
     }
 }

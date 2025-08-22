@@ -2,6 +2,7 @@ package com.sesac.solbid.domain;
 
 import com.sesac.solbid.domain.enums.ProviderType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -34,4 +35,11 @@ public class SocialLogin {
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    public SocialLogin(User user, ProviderType provider, String providerId) {
+        this.user = user;
+        this.provider = provider;
+        this.providerId = providerId;
+    }
 }
