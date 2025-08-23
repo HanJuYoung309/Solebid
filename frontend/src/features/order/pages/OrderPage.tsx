@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Pagination from "../../../components/Pagination";
+import { getFromDate } from "../../../utils/get-from-date";
 import { OrderList, OrderSearch } from "../components";
 import OrderHeader from "../components/OrderHeader";
 import { orders as mockOrders, periods, statuses } from "../components/mockData";
@@ -17,13 +18,27 @@ const OrderPage = () => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
     };
 
-    const filteredOrders = mockOrders.filter((order) => {
-        const matchesSearch =
-            order.id.includes(searchQuery) ||
-            order.items.some((item) => item.name.includes(searchQuery));
-        const matchesStatus = selectedStatus === "전체" || order.status === selectedStatus;
-        return matchesSearch && matchesStatus;
-    })
+    const filteredOrders = useMemo(() => {
+        const fromDate = getFromDate(selectedPeriod);
+        const today = new Date();
+
+        return mockOrders.filter((order) => {
+            const matchesSearch =
+                order.id.includes(searchQuery) ||
+                order.items.some((item) => item.name.includes(searchQuery));
+            const matchesStatus =
+                selectedStatus === "전체" || order.status === selectedStatus;
+
+            if (!fromDate) {
+                return matchesSearch && matchesStatus;
+            }
+
+            const orderDate = new Date(order.date.replace(/\./g, "-"));
+            const matchesPeriod = orderDate >= fromDate && orderDate <= today;
+
+            return matchesSearch && matchesStatus && matchesPeriod;
+        });
+    }, [searchQuery, selectedPeriod, selectedStatus]);
 
     const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
 
