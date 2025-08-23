@@ -1,13 +1,14 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 
 import MainPage from './features/main/pages/MainPage';
+import OrderPage from "./features/order/pages/OrderPage.tsx";
 import AuctionBidPage from './features/product/pages/AuctionBidPage';
 import AuctionPage from './features/product/pages/AuctionPage';
 import BrandPage from './features/product/pages/BrandPage';
 import CategoryPage from './features/product/pages/CategoryPage';
 import RankingPage from './features/product/pages/RankingPage';
 import SearchPage from './features/product/pages/SearchPage';
-import ProfilePage from './features/profile/pages/ProfilePage.tsx';
+import ProfilePage from './features/profile/pages/ProfilePage';
 import Login from "./features/user/pages/Login.tsx";
 import NicknameSetup from "./features/user/pages/NicknameSetup.tsx";
 import OAuth2Callback from "./features/user/pages/OAuth2Callback.tsx";
@@ -28,6 +29,7 @@ const router = createBrowserRouter(
             <Route path="/brand" element={<BrandPage />} />
             <Route path="/ranking" element={<RankingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/order" element={<OrderPage />} />
         </Route>
     )
 )
