@@ -35,7 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
-application.properties
 
-### evn ###
+### Environment variables and sensitive data ###
 .env
+application.properties
