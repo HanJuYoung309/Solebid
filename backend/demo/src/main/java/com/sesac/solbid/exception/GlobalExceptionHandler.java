@@ -65,6 +65,13 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("INVALID_INPUT_VALUE", errorMessage));
     }
 
+    // JWT/서명 관련 예외는 401로 응답
+    @ExceptionHandler({io.jsonwebtoken.JwtException.class, io.jsonwebtoken.security.SecurityException.class})
+    public ResponseEntity<ApiResponse<Void>> handleJwtException(Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("UNAUTHORIZED", "유효하지 않은 토큰입니다."));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleAll(HttpServletRequest request, Exception e) throws Exception {
         String uri = request.getRequestURI();
