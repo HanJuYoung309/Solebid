@@ -3,7 +3,7 @@ import type { OrderItemProps } from "../types/OrderItemProps";
 
 const OrderItem = ({ order, isExpanded, onToggleExpand }: OrderItemProps) => {
     return (
-        <div className="bg-white rounded-lg shadow-sm border">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div
                 onClick={() => onToggleExpand(order.id)}
                 className="p-6 cursor-pointer hover:bg-gray-50"   >
@@ -56,7 +56,7 @@ const OrderItem = ({ order, isExpanded, onToggleExpand }: OrderItemProps) => {
             </div>
             {/* Expanded Order Details */}
             {isExpanded && (
-                <div className="border-t bg-gray-50 p-6">
+                <div className="border-t border-gray-200 bg-gray-50 p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div>
                             <h4 className="font-semibold text-gray-900 mb-3">
@@ -119,7 +119,7 @@ const OrderItem = ({ order, isExpanded, onToggleExpand }: OrderItemProps) => {
                                         </span>
                                     </div>
                                 )}
-                                <div className="pt-2 border-t">
+                                <div className="pt-2 border-t border-gray-200">
                                     <span className="text-gray-600 text-sm">배송지</span>
                                     <p className="font-medium text-sm mt-1">
                                         {order.deliveryAddress}

@@ -1,5 +1,5 @@
-import { menu } from "./mockData";
 import { Link } from "react-router-dom";
+import { menu } from "./mockData";
 
 const ProfileMenu = () => {
     return (
