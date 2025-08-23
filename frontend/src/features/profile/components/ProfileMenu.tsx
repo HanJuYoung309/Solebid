@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { menu } from "./mockData";
 
 const ProfileMenu = () => {
@@ -8,13 +9,14 @@ const ProfileMenu = () => {
             </h3>
             <nav className="space-y-2">
                 {menu.map((link, index) => (
-                    <a
+                    <Link
                         key={index}
-                        href={link.href}
-                        className="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100 cursor-pointer" >
+                        to={link.href}
+                        className="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100 cursor-pointer"
+                    >
                         <i className={`${link.icon} w-5 text-center mr-3`} />
                         {link.text}
-                    </a>
+                    </Link>
                 ))}
             </nav>
         </div>
