@@ -1,4 +1,4 @@
-export interface Wish {
+export interface ProfileWishProps {
     id: number;
     name: string;
     price: string;

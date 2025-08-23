@@ -1,118 +1,28 @@
-import { Fragment, useState } from "react";
-import Modal from "../../../components/Modal";
-
-const InfoEditFormat = ({ onClose }: { onClose: () => void }) => {
-    const [email, setEmail] = useState("minsu.kim@email.com");
-    const [phone, setPhone] = useState("010-1234-5678");
-    const [address, setAddress] = useState("서울특별시 강남구 테헤란로 123 ABC빌딩 456호");
-
-    const handleSave = () => {
-        console.log("Updated info: ", { email, phone, address });
-        alert("개인정보가 성공적으로 업데이트되었습니다.");
-        onClose();
-    };
-
-    return (
-        <Fragment>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                개인정보 수정
-            </h3>
-            <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        이메일
-                    </label>
-                    <input
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div>
-                    <label
-                        className="block text-sm font-medium text-gray-700 mb-2">
-                        연락처
-                    </label>
-                    <input
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)} />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        주소
-                    </label>
-                    <textarea
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        rows={2} />
-                </div>
-            </div>
-            <div className="flex justify-end space-x-3 mt-6">
-                <button
-                    className="px-4 py-2 text-gray-600 hover:text-gray-900 !rounded-button whitespace-nowrap"
-                    onClick={onClose}>
-                    취소
-                </button>
-                <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 !rounded-button whitespace-nowrap"
-                    onClick={handleSave}>
-                    저장
-                </button>
-            </div>
-        </Fragment>
-    );
-};
-
-const PersonalInfo = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const ProfileInfo = () => {
     return (
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                개인정보
-            </h3>
-            <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        이메일
-                    </label>
-                    <div className="text-gray-900">
-                        minsu.kim@email.com
-                    </div>
+            <div className="text-center mb-6">
+                <div className="relative inline-block">
+                    <img
+                        src="https://readdy.ai/api/search-image?query=professional%20korean%20business%20person%20portrait%20with%20clean%20white%20background%20modern%20lighting%20warm%20smile%20confident%20expression%20high%20quality%20photography&width=120&height=120&seq=profile001&orientation=squarish"
+                        alt="프로필 이미지"
+                        className="w-20 h-20 rounded-full object-cover mx-auto" />
+                    <button className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer hover:bg-blue-600">
+                        <i className="fas fa-camera text-xs" />
+                    </button>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        연락처
-                    </label>
-                    <div className="text-gray-900">
-                        010-1234-5678
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        주소
-                    </label>
-                    <div className="text-gray-900 text-sm">
-                        서울특별시 강남구 테헤란로 123
-                        <br />
-                        ABC빌딩 456호
-                    </div>
-                </div>
-                <button
-                    className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer !rounded-button whitespace-nowrap"
-                    onClick={() => setIsModalOpen(true)}>
-                    정보 수정
+                <h2 className="text-xl font-semibold text-gray-900 mt-3">
+                    김민수
+                </h2>
+                <p className="text-gray-600 text-sm">
+                    안녕하세요! 좋은 하루 되세요 😊
+                </p>
+                <button className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 cursor-pointer !rounded-button whitespace-nowrap">
+                    프로필 편집
                 </button>
             </div>
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}>
-                <InfoEditFormat onClose={() => setIsModalOpen(false)} />
-            </Modal>
         </div>
     );
 };
 
-export default PersonalInfo;
+export default ProfileInfo;

@@ -1,4 +1,4 @@
-export interface Order {
+export interface ProfileOrderProps {
     id: number;
     name: string;
     date: string;
