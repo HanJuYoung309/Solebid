@@ -1,13 +1,7 @@
 import { Link } from "react-router-dom";
+import { menu } from "./mockData";
 
 const ProfileMenu = () => {
-    const menu = [
-        { icon: "fas fa-shopping-cart", text: "주문/배송 조회", href: "/order" },
-        { icon: "fas fa-heart", text: "찜한 상품", href: "#" },
-        { icon: "fas fa-star", text: "리뷰 관리", href: "#" },
-        { icon: "fas fa-headset", text: "고객센터", href: "#" },
-        { icon: "fas fa-cog", text: "설정", href: "#" },
-    ];
     return (
         <div className="bg-white rounded-lg shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
