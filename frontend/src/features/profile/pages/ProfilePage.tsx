@@ -1,16 +1,17 @@
-import { ProfileAccount, ProfileHeader, ProfileInfo, ProfileMenu, ProfileOrder, ProfileStats, ProfileUser } from "../components";
+import { ProfileAccount, ProfileHeader, ProfileInfo, ProfileMenu, ProfileOrder, ProfileStats, ProfileWish } from "../components";
 import ProfilePoint from "../components/ProfilePoint";
-import ProfileWish from "../components/ProfileWish";
 
-const App = () => {
+const ProfilePage = () => {
     return (
         <div className="min-h-screen bg-gray-50">
-            <ProfileHeader />
+            <header className="bg-white shadow-sm">
+                <ProfileHeader />
+            </header>
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-12 gap-8">
                     {/* Left Sidebar */}
                     <aside className="col-span-3">
-                        <ProfileUser />
+                        <ProfileInfo />
                         <ProfileMenu />
                     </aside>
                     {/* Main Content */}
@@ -21,7 +22,6 @@ const App = () => {
                     </section>
                     {/* Right Sidebar */}
                     <aside className="col-span-3">
-                        <ProfileInfo />
                         <ProfilePoint />
                         <ProfileAccount />
                     </aside>
@@ -31,4 +31,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default ProfilePage;

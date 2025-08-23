@@ -23,7 +23,7 @@ const PointConvertFormat = ({ onClose }: { onClose: () => void }) => {
                         step="1000"
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="absolute right-3 top-2 text-gray-500">
+                    <span className="absolute right-10 top-2 text-gray-500">
                         원
                     </span>
                 </div>

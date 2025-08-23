@@ -14,7 +14,7 @@ const ProfileAccount = () => {
                     로그아웃
                 </button>
             </div>
-            <div className="mt-6 pt-4 border-t">
+            <div className="mt-6 pt-4 border-t border-gray-200">
                 <div className="text-center space-y-2">
                     <a
                         href="#"

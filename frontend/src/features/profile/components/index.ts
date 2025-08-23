@@ -4,6 +4,5 @@ export { default as ProfileMenu } from './ProfileMenu';
 export { default as ProfileOrder } from './ProfileOrder';
 export { default as ProfilePoint } from './ProfilePoint';
 export { default as ProfileStats } from './ProfileStats';
-export { default as ProfileUser } from './ProfileUser';
 export { default as ProfileWish } from './ProfileWish';
 export { default as ProfileAccount } from './ProfileAccount';
