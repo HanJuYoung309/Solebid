@@ -71,6 +71,12 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. id=" + userId));
     }
 
+    // 이메일로 사용자 조회 (현재 사용자 조회용)
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAILED));
+    }
+
     // 닉네임 가용성 확인
     public boolean isNicknameAvailable(String nickname) {
         if (nickname == null || nickname.isBlank()) return false;

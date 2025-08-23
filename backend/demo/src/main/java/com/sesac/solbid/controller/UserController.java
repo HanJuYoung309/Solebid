@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -93,6 +95,30 @@ public class UserController {
         data.put("nickname", updated.getNickname());
 
         return ResponseEntity.ok(ApiResponse.success(data, "닉네임이 설정되었습니다."));
+    }
+
+    // 현재 사용자 조회 (accessToken 쿠키 필요)
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> me(HttpServletRequest request) {
+        Optional<String> accessTokenOpt = getCookieValue(request, "accessToken");
+        if (accessTokenOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "로그인이 필요합니다."));
+        }
+        try {
+            String email = jwtUtil.getUsernameFromToken(accessTokenOpt.get());
+            User user = userService.getByEmail(email);
+            Map<String, Object> data = new HashMap<>();
+            data.put("userId", user.getUserId());
+            data.put("email", user.getEmail());
+            data.put("nickname", user.getNickname());
+            data.put("userType", user.getUserType() != null ? user.getUserType().name() : null);
+            return ResponseEntity.ok(ApiResponse.success(data));
+        } catch (Exception e) {
+            log.warn("/api/users/me 처리 실패", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("UNAUTHORIZED", "유효하지 않은 토큰입니다."));
+        }
     }
 
     private Optional<String> getCookieValue(HttpServletRequest request, String name) {

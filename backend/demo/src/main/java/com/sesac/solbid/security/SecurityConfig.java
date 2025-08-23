@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/oauth2/*/url",
                                 "/api/auth/oauth2/*/callback",
-                                "/api/auth/oauth2/logout"
+                                "/api/auth/logout"
                         ).permitAll()
                         // 그 외 모든 요청은 일단 허용 (프로젝트 요구사항에 맞게 .authenticated() 등으로 변경 필요)
                         .anyRequest().permitAll()
