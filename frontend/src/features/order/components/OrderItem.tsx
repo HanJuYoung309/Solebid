@@ -1,4 +1,4 @@
-import { getBadgeClass } from "../../../utils/get-badge-classe";
+import { getBadgeClass } from "../../../utils/get-badge-class";
 import type { OrderItemProps } from "../types/OrderItemProps";
 
 const OrderItem = ({ order, isExpanded, onToggleExpand }: OrderItemProps) => {
