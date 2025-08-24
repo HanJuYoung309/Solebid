@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function AuctionBid() {
+function Bid() {
     const navigate = useNavigate();
 
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -470,4 +470,4 @@ function AuctionBid() {
     );
 }
 
-export default AuctionBid;
+export default Bid;

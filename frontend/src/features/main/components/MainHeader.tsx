@@ -165,7 +165,7 @@ function MainHeader() {
                     </div>
                     <button
                         className="px-4 py-2 bg-blue-500 text-white !rounded-button hover:bg-blue-600 cursor-pointer whitespace-nowrap"
-                        onClick={() => navigate(`/auction/bid`)}
+                        onClick={() => navigate(`/bid`)}
                     >
                         경매 등록
                     </button>
