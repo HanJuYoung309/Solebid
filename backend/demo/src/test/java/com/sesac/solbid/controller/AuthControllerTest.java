@@ -206,7 +206,7 @@ class AuthControllerTest {
     @DisplayName("로그아웃 성공")
     void logout_Success() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/auth/oauth2/logout")
+        mockMvc.perform(post("/api/auth/logout")
                         .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -616,12 +616,12 @@ class AuthControllerTest {
     @DisplayName("로그아웃 - 이미 로그아웃된 상태에서 재요청")
     void logout_AlreadyLoggedOut() throws Exception {
         // When & Then - 여러 번 로그아웃 요청해도 성공
-        mockMvc.perform(post("/api/auth/oauth2/logout")
+        mockMvc.perform(post("/api/auth/logout")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
-        mockMvc.perform(post("/api/auth/oauth2/logout")
+        mockMvc.perform(post("/api/auth/logout")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
