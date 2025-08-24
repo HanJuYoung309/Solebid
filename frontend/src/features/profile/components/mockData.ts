@@ -4,7 +4,7 @@ import type { ProfileWishProps } from "../types/ProfileWishProps";
 
 export const menu = [
     { icon: "fas fa-shopping-cart", text: "주문/배송 조회", href: "/order" },
-    { icon: "fas fa-heart", text: "찜한 상품", href: "#" },
+    { icon: "fas fa-heart", text: "찜한 상품", href: "/wish" },
     { icon: "fas fa-cog", text: "설정", href: "#" },
 ];
 
