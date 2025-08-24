@@ -30,7 +30,8 @@ const NicknameSetup: React.FC = () => {
       } else {
         setAvailable(false);
       }
-    } catch {
+    } catch (e) {
+      console.debug('닉네임 중복 확인 실패', e);
       setAvailable(false);
     } finally {
       setChecking(false);
@@ -65,19 +66,23 @@ const NicknameSetup: React.FC = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        // 사용자 정보 로컬 저장 갱신
-        if (data.data?.nickname) {
-          localStorage.setItem('nickname', data.data.nickname);
+        // 헤더 즉시 반영: 세션 캐시 갱신 및 이벤트 발행
+        try {
+          const cachedRaw = sessionStorage.getItem('auth.user');
+          const merged = { ...(cachedRaw ? JSON.parse(cachedRaw) : {}), ...(data.data || {}), nickname: data.data?.nickname || nickname.trim() };
+          sessionStorage.setItem('auth.user', JSON.stringify(merged));
+          const evt = new CustomEvent('auth-changed', { detail: { user: merged } });
+          window.dispatchEvent(evt);
+        } catch (e) {
+          console.debug('닉네임 설정 후 세션 갱신 실패', e);
         }
-        if (data.data?.userId) {
-          localStorage.setItem('userId', String(data.data.userId));
-        }
+        // 메인으로 이동 (전체 새로고침 제거)
         navigate('/');
-        window.location.reload();
       } else {
         setError(data.message || '닉네임 설정에 실패했습니다.');
       }
-    } catch {
+    } catch (e) {
+      console.debug('닉네임 설정 요청 실패', e);
       setError('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setSubmitting(false);

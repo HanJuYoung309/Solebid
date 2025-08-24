@@ -1,57 +1,109 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function MainHeader() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [userProfile, setUserProfile] = useState({
         name: "사용자", // 기본값
     });
 
-    useEffect(() => {
-        const checkLoginStatus = () => {
-            // Login.tsx 정책: 토큰은 HttpOnly 쿠키, 사용자 정보(nickname, userId)만 localStorage 저장
-            const nickname = localStorage.getItem('nickname');
-            const userId = localStorage.getItem('userId');
-            if (nickname && userId) {
+    const applyCachedUser = () => {
+        try {
+            const raw = sessionStorage.getItem('auth.user');
+            if (raw) {
+                const cached = JSON.parse(raw);
+                if (cached && (cached.nickname || cached.email || cached.userId)) {
+                    setIsLoggedIn(true);
+                    setUserProfile({ name: cached.nickname || "사용자" });
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.debug('applyCachedUser: 세션 파싱 실패', e);
+        }
+        return false;
+    };
+
+    const fetchMe = async () => {
+        // 캐시를 먼저 반영
+        const hadCache = applyCachedUser();
+        try {
+            const res = await fetch('/api/users/me', { credentials: 'include' });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                const user = data.data || null;
                 setIsLoggedIn(true);
-                setUserProfile({ name: nickname });
-            } else {
+                setUserProfile({ name: user?.nickname || "사용자" });
+                try { sessionStorage.setItem('auth.user', JSON.stringify(user));
+                } catch (e) {
+                    console.debug('fetchMe: 세션 저장 실패', e);
+                }
+            } else if (!hadCache) {
+                setIsLoggedIn(false);
+                setUserProfile({ name: "사용자" });
+                try { sessionStorage.removeItem('auth.user'); } catch (e) { console.debug('fetchMe: 세션 제거 실패', e); }
+            }
+        } catch (e) {
+            console.debug('fetchMe: 호출 실패', e);
+            if (!hadCache) {
                 setIsLoggedIn(false);
                 setUserProfile({ name: "사용자" });
             }
-        };
+        }
+    };
 
-        checkLoginStatus();
-        window.addEventListener('storage', checkLoginStatus);
+    // 최초 마운트 및 라우트 변경 시 재검증(+즉시 캐시 반영)
+    useEffect(() => {
+        applyCachedUser();
+        fetchMe();
+    }, [location.pathname]);
 
-        return () => {
-            window.removeEventListener('storage', checkLoginStatus);
+    // 로그인/로그아웃 등 인증 상태 변경 이벤트 수신 (즉시 반영 후 백그라운드 검증)
+    useEffect(() => {
+        const handler = (evt: Event) => {
+            try {
+                const detailUser = (evt as CustomEvent).detail?.user;
+                if (detailUser) {
+                    sessionStorage.setItem('auth.user', JSON.stringify(detailUser));
+                    setIsLoggedIn(true);
+                    setUserProfile({ name: detailUser.nickname || "사용자" });
+                } else {
+                    sessionStorage.removeItem('auth.user');
+                    setIsLoggedIn(false);
+                    setUserProfile({ name: "사용자" });
+                }
+            } catch (e) {
+                console.debug('auth-changed 핸들러 오류', e);
+            } finally {
+                // 서버 상태 확인 (백그라운드)
+                fetchMe();
+            }
         };
+        window.addEventListener('auth-changed', handler as EventListener);
+        return () => window.removeEventListener('auth-changed', handler as EventListener);
     }, []);
 
     const handleLogout = async () => {
         try {
             // 서버에 로그아웃 요청하여 HttpOnly 쿠키 제거
-            await fetch('/api/auth/oauth2/logout', {
+            await fetch('/api/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
             });
         } catch (e) {
-            // 네트워크 오류 시에도 클라이언트 측 상태는 정리
             console.error('logout error', e);
         } finally {
-            // Login.tsx 저장 방식에 맞춰 정리
-            localStorage.removeItem('nickname');
-            localStorage.removeItem('userId');
-
+            try { sessionStorage.removeItem('auth.user'); } catch (e) { console.debug('logout: 세션 제거 실패', e); }
             setIsLoggedIn(false);
             setShowProfileMenu(false);
+            // 상태 변화 이벤트 브로드캐스트(로그아웃 알림)
+            const evt = new CustomEvent('auth-changed', { detail: { user: null } });
+            window.dispatchEvent(evt);
             navigate('/');
-            // 새 쿠키 상태 반영을 위해 새로고침
-            window.location.reload();
         }
     };
 

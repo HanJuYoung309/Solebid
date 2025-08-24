@@ -55,10 +55,16 @@ const OAuth2Callback: React.FC = () => {
           // 중복 방지를 위해 처리 완료 플래그 저장
           sessionStorage.setItem(guardKey, '1');
 
-          // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
-          // 사용자 정보만 localStorage에 저장
-          if (data.data?.nickname) localStorage.setItem('nickname', data.data.nickname);
-          if (data.data?.userId) localStorage.setItem('userId', data.data.userId.toString());
+          // 로그인 사용자 정보를 즉시 캐시에 저장하고 헤더 즉시 반영
+          try {
+            if (data.data) {
+              sessionStorage.setItem('auth.user', JSON.stringify(data.data));
+              const evt = new CustomEvent('auth-changed', { detail: { user: data.data } });
+              window.dispatchEvent(evt);
+            }
+          } catch (e) {
+            console.debug('OAuth2Callback: 세션 캐시/이벤트 반영 실패', e);
+          }
 
           setStatus('success');
           setMessage('로그인이 완료되었습니다. 잠시 후 이동합니다.');
@@ -70,9 +76,8 @@ const OAuth2Callback: React.FC = () => {
               navigate('/nickname-setup');
             } else {
               navigate('/');
-              window.location.reload();
             }
-          }, 1000);
+          }, 600);
         } else {
           setStatus('error');
           setMessage(data.message || '로그인에 실패했습니다.');

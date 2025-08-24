@@ -18,20 +18,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 
 /**
- * OAuth2 소셜로그인 인증 컨트롤러
+ * 인증 컨트롤러
  * 소셜로그인 URL 생성 및 콜백 처리를 담당
  */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/oauth2")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final OAuth2Service oAuth2Service;
 
     /**
      * 로그아웃 처리
-     * POST /api/auth/oauth2/logout
+     * POST /api/auth/logout
      */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Object>> logout(HttpServletResponse response) {
@@ -63,7 +63,7 @@ public class AuthController {
      * @param provider 소셜 플랫폼 이름 (google, kakao)
      * @return 인증 URL과 state 정보
      */
-    @GetMapping("/{provider}/url")
+    @GetMapping("/oauth2/{provider}/url")
     public ResponseEntity<ApiResponse<OAuth2Dto.AuthUrlResponse>> generateAuthUrl(
             @PathVariable String provider,
             HttpServletRequest request) {
@@ -107,7 +107,7 @@ public class AuthController {
      * @param request 콜백 요청 (code, state)
      * @return 로그인 응답 (JWT 토큰 포함)
      */
-    @PostMapping("/{provider}/callback")
+    @PostMapping("/oauth2/{provider}/callback")
     public ResponseEntity<ApiResponse<OAuth2Dto.LoginSuccessResponse>> handleCallback(
             @PathVariable String provider,
             @Valid @RequestBody OAuth2Dto.CallbackRequest request,

@@ -16,7 +16,7 @@ const Login: React.FC = () => {
             ...prev,
             [name]: value,
         }));
-        if (errors[name] || errors.submit) {
+        if (errors[name] || (errors as any).submit) {
             setErrors((prev) => ({
                 ...prev,
                 [name]: "",
@@ -61,13 +61,19 @@ const Login: React.FC = () => {
 
             if (response.ok && result.success) {
                 setErrors({});
-                // 토큰은 HttpOnly 쿠키에 자동 저장됨, localStorage 사용 안 함
-                // 사용자 정보만 localStorage에 저장
-                localStorage.setItem('nickname', result.data.nickname);
-                localStorage.setItem('userId', result.data.userId.toString());
-
+                // 사용자 정보를 세션에 저장하여 헤더가 즉시 반영할 수 있도록 함
+                if (result.data) {
+                    try {
+                        sessionStorage.setItem('auth.user', JSON.stringify(result.data));
+                    } catch (e) {
+                        console.debug('auth.user 세션 저장 실패', e);
+                    }
+                }
+                // 커스텀 이벤트로 사용자 정보를 전달하여 즉시 반영 유도
+                const evt = new CustomEvent('auth-changed', { detail: { user: result.data || null } });
+                window.dispatchEvent(evt);
+                // 홈으로 이동
                 navigate("/");
-                window.location.reload();
             } else {
                 setErrors({
                     submit: result.message || "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
