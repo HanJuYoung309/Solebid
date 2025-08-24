@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import Pagination from "../../../components/Pagination";
 import { getFromDate } from "../../../utils/get-from-date";
-import { OrderList, OrderSearch } from "../components";
-import OrderHeader from "../components/OrderHeader";
+import { OrderHeader, OrderList, OrderSearch } from "../components";
 import { orders as mockOrders, periods, statuses } from "../components/mockData";
 
 const ITEMS_PER_PAGE = 3;
