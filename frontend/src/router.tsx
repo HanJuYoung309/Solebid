@@ -1,5 +1,6 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 
+import CartPage from './features/cart/pages/CartPage';
 import MainPage from './features/main/pages/MainPage';
 import OrderPage from "./features/order/pages/OrderPage";
 import AuctionPage from './features/product/pages/AuctionPage';
@@ -9,7 +10,7 @@ import CategoryPage from './features/product/pages/CategoryPage';
 import RankingPage from './features/product/pages/RankingPage';
 import SearchPage from './features/product/pages/SearchPage';
 import WishPage from './features/product/pages/WishPage';
-import ProfilePage from './features/profile/pages/ProfilePage.tsx';
+import ProfilePage from './features/profile/pages/ProfilePage';
 
 import Login from "./features/user/pages/Login.tsx";
 import NicknameSetup from "./features/user/pages/NicknameSetup.tsx";
@@ -39,6 +40,7 @@ const router = createBrowserRouter(
             <Route path="/wish" element={<WishPage />} />
             <Route path="/points/charge" element={<ChargePointsPage />} />
             <Route path="/result" element={<ChargeResultPage />} />
+            <Route path="/cart" element={<CartPage />} />
         </Route>
     )
 )

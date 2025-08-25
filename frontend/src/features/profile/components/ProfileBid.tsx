@@ -1,8 +1,8 @@
-import type { ProfileOrderProps } from "../types/ProfileOrderProps";
-import { orderData } from "./mockData";
+import { Link } from "react-router-dom";
+import type { ProfileBidProps } from "../types/ProfileBidProps";
+import { bidData } from "./mockData";
 
-const OrderItem: React.FC<ProfileOrderProps> = ({ name, date, price, status, imageUrl }) => {
-    const statusColor = status === '배송완료' ? 'text-green-600' : 'text-blue-600';
+const BidItem: React.FC<ProfileBidProps> = ({ name, date, price, imageUrl }) => {
     return (
         <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
             <div className="flex items-center">
@@ -23,30 +23,29 @@ const OrderItem: React.FC<ProfileOrderProps> = ({ name, date, price, status, ima
                 <div className="font-semibold text-gray-900">
                     {price}
                 </div>
-                <div className={`${statusColor} text-sm`}>
-                    {status}
-                </div>
             </div>
         </div>
     );
 }
 
-const ProfileOrder = () => {
+const ProfileBid = () => {
     return (
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">
-                    최근 주문 내역
+                    최근 낙찰 내역
                 </h3>
-                <button className="text-blue-600 text-sm hover:text-blue-800 cursor-pointer">
+                <Link
+                    to="/cart"
+                    className="text-blue-600 text-sm hover:text-blue-800 cursor-pointer">
                     전체 보기
-                </button>
+                </Link>
             </div>
             <div className="space-y-4">
-                {orderData.map(order => <OrderItem key={order.id} {...order} />)}
+                {bidData.map(order => <BidItem key={order.id} {...order} />)}
             </div>
         </div>
     );
 };
 
-export default ProfileOrder;
+export default ProfileBid;

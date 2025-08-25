@@ -29,10 +29,10 @@ const WishItem: React.FC<WishItemProps> = ({
             <p className="text-gray-500 text-xs mb-4">
                 {item.dateAdded} 등록
             </p>
-            <Link to="https://readdy.ai/home/...">
-                <button className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 cursor-pointer !rounded-button whitespace-nowrap">
-                    입찰하기
-                </button>
+            <Link
+                to="https://readdy.ai/home/..."
+                className="flex justify-center w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 cursor-pointer !rounded-button whitespace-nowrap">
+                입찰하기
             </Link>
         </div>
     </div>
