@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import type { ProfileWishProps } from "../types/ProfileWishProps";
 import { wishData } from "./mockData";
 
@@ -23,9 +24,12 @@ const ProfileWish = () => {
                 <h3 className="text-lg font-semibold text-gray-900">
                     찜한 상품
                 </h3>
-                <button className="text-blue-600 text-sm hover:text-blue-800 cursor-pointer">
+                <Link
+                    to="/wish"
+                    className="text-blue-600 text-sm hover:text-blue-800 cursor-pointer"
+                >
                     전체 보기
-                </button>
+                </Link>
             </div>
             <div className="grid grid-cols-3 gap-4">
                 {wishData.map(item => <WishItem key={item.id} {...item} />)}

@@ -1,4 +1,4 @@
-import { ProfileAccount, ProfileHeader, ProfileInfo, ProfileMenu, ProfileOrder, ProfileStats, ProfileWish } from "../components";
+import { ProfileAccount, ProfileBid, ProfileHeader, ProfileInfo, ProfileMenu, ProfileStats, ProfileWish } from "../components";
 import ProfilePoint from "../components/ProfilePoint";
 
 const ProfilePage = () => {
@@ -17,7 +17,7 @@ const ProfilePage = () => {
                     {/* Main Content */}
                     <section className="col-span-6">
                         <ProfileStats />
-                        <ProfileOrder />
+                        <ProfileBid />
                         <ProfileWish />
                     </section>
                     {/* Right Sidebar */}
