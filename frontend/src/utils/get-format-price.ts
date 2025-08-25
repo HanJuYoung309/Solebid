@@ -1,0 +1,1 @@
+export const getFormatPrice = (price: number) => `${price.toLocaleString()}원`;
