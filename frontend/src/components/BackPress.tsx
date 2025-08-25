@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import type { BackButtonProps } from '../types/BackButtonProps';
+import type { BackPressProps } from '../types/BackPressProps';
 
-const BackButton: React.FC<BackButtonProps> = ({ children, className }) => {
+const BackPress: React.FC<BackPressProps> = ({ children, className }) => {
     const navigate = useNavigate();
     const handleBackPressed = () => { navigate(-1); };
     return (
@@ -14,4 +14,4 @@ const BackButton: React.FC<BackButtonProps> = ({ children, className }) => {
     );
 };
 
-export default BackButton;
+export default BackPress;
