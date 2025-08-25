@@ -17,5 +17,5 @@ jobs:
       - name: Close linked issue
         uses: peter-evans/close-issue@v3
         with:
-          close-message: '개발 브랜치에 병합되어 이슈를 닫습니다. (Closed by PR)'
+          comment: '개발 브랜치에 병합되어 이슈를 닫습니다. (Closed by PR)'
           token: ${{ secrets.GITHUB_TOKEN }}
