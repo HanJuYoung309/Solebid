@@ -5,7 +5,6 @@ import WishItem from "./WishItem";
 const WishList: React.FC<WishListProps> = ({
     items,
     onRemove,
-    onAddToCart,
 }) => {
     if (items.length === 0) {
         return <WishEmptyList />;
@@ -17,7 +16,6 @@ const WishList: React.FC<WishListProps> = ({
                     key={item.id}
                     item={item}
                     onRemove={onRemove}
-                    onAddToCart={onAddToCart}
                 />
             ))}
         </div>
