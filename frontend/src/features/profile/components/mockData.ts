@@ -1,4 +1,4 @@
-import type { ProfileOrderProps } from "../types/ProfileOrderProps";
+import type { ProfileBidProps } from "../types/ProfileBidProps";
 import type { ProfileStatProps } from "../types/ProfileStatProps";
 import type { ProfileWishProps } from "../types/ProfileWishProps";
 
@@ -8,10 +8,10 @@ export const menu = [
     { icon: "fas fa-cog", text: "설정", href: "#" },
 ];
 
-export const orderData: ProfileOrderProps[] = [
-    { id: 1, name: "무선 블루투스 헤드폰", date: "2024.01.15 주문", price: "89,000원", status: "배송완료", imageUrl: "https://readdy.ai/api/search-image?query=modern%20wireless%20bluetooth%20headphones%20black%20color%20clean%20white%20background%20product%20photography%20professional%20lighting%20high%20quality&width=60&height=60&seq=product001&orientation=squarish" },
-    { id: 2, name: "프리미엄 원두 커피", date: "2024.01.12 주문", price: "25,000원", status: "배송중", imageUrl: "https://readdy.ai/api/search-image?query=premium%20coffee%20beans%20package%20bag%20dark%20roast%20clean%20white%20background%20product%20photography%20professional%20lighting%20high%20quality&width=60&height=60&seq=product002&orientation=squarish" },
-    { id: 3, name: "스마트폰 케이스", date: "2024.01.10 주문", price: "15,000원", status: "배송완료", imageUrl: "https://readdy.ai/api/search-image?query=modern%20smartphone%20case%20clear%20transparent%20design%20clean%20white%20background%20product%20photography%20professional%20lighting%20high%20quality&width=60&height=60&seq=product003&orientation=squarish" },
+export const bidData: ProfileBidProps[] = [
+    { id: 1, name: "무선 블루투스 헤드폰", date: "2024.01.15", price: "89,000원", imageUrl: "https://readdy.ai/api/search-image?query=modern%20wireless%20bluetooth%20headphones%20black%20color%20clean%20white%20background%20product%20photography%20professional%20lighting%20high%20quality&width=60&height=60&seq=product001&orientation=squarish" },
+    { id: 2, name: "프리미엄 원두 커피", date: "2024.01.12", price: "25,000원", imageUrl: "https://readdy.ai/api/search-image?query=premium%20coffee%20beans%20package%20bag%20dark%20roast%20clean%20white%20background%20product%20photography%20professional%20lighting%20high%20quality&width=60&height=60&seq=product002&orientation=squarish" },
+    { id: 3, name: "스마트폰 케이스", date: "2024.01.10", price: "15,000원", imageUrl: "https://readdy.ai/api/search-image?query=modern%20smartphone%20case%20clear%20transparent%20design%20clean%20white%20background%20product%20photography%20professional%20lighting%20high%20quality&width=60&height=60&seq=product003&orientation=squarish" },
 ];
 
 export const statsData: ProfileStatProps[] = [
