@@ -4,6 +4,7 @@ import type {
     PortOneIMP,
     PortOnePayMethod,
     PortOnePayResponse,
+    PortOnePayRequest,
 } from "../constants/portone";
 
 /* ---------- type guards (unknown → 구체 타입으로 내로잉) ---------- */
@@ -14,9 +15,11 @@ function hasString(r: Record<string, unknown>, k: string): r is Record<string, s
     return typeof r[k] === "string";
 }
 function isPortOneIMP(v: unknown): v is PortOneIMP {
-    return isRecord(v)
-        && typeof (v as Record<string, unknown>).init === "function"
-        && typeof (v as Record<string, unknown>).request_pay === "function";
+    return (
+        isRecord(v) &&
+        typeof (v as Record<string, unknown>).init === "function" &&
+        typeof (v as Record<string, unknown>).request_pay === "function"
+    );
 }
 function isPortOnePayResponse(v: unknown): v is PortOnePayResponse {
     if (!isRecord(v)) return false;
@@ -24,10 +27,12 @@ function isPortOnePayResponse(v: unknown): v is PortOnePayResponse {
     const imp_uid = v["imp_uid"];
     const merchant_uid = v["merchant_uid"];
     const error_msg = v["error_msg"];
-    return typeof success === "boolean"
-        && (imp_uid === undefined || typeof imp_uid === "string")
-        && (merchant_uid === undefined || typeof merchant_uid === "string")
-        && (error_msg === undefined || typeof error_msg === "string");
+    return (
+        typeof success === "boolean" &&
+        (imp_uid === undefined || typeof imp_uid === "string") &&
+        (merchant_uid === undefined || typeof merchant_uid === "string") &&
+        (error_msg === undefined || typeof error_msg === "string")
+    );
 }
 function getErrorMessage(err: unknown): string {
     return err instanceof Error ? err.message : String(err);
@@ -35,9 +40,11 @@ function getErrorMessage(err: unknown): string {
 
 /* ---------- SDK 로딩 ---------- */
 async function loadPortoneSDK(): Promise<PortOneIMP> {
+    // 전역에 이미 로드되어 있으면 그걸 사용
     if (isPortOneIMP((window as unknown as { IMP?: unknown }).IMP)) {
         return (window as { IMP: PortOneIMP }).IMP;
     }
+    // 동적 로딩
     await new Promise<void>((resolve, reject) => {
         const s = document.createElement("script");
         s.src = PORTONE_SDK_URL;
@@ -57,13 +64,14 @@ async function loadPortoneSDK(): Promise<PortOneIMP> {
 type PayMethod = PortOnePayMethod;
 
 /* ---------- 메인 함수 ---------- */
+/** 결제 성공 시 impUid/merchantUid/orderId 를 반환합니다. */
 export async function startPortoneCharge(params: {
     amount: number;
     payMethod?: PayMethod; // default: card
     redirectUrl?: string;
     buyer?: { email?: string; name?: string; tel?: string };
     pg?: string; // default: html5_inicis
-}): Promise<void> {
+}): Promise<{ impUid?: string; merchantUid?: string; orderId: string }> {
     const {
         amount,
         payMethod = "card",
@@ -99,18 +107,20 @@ export async function startPortoneCharge(params: {
     const orderId = (jsonUnknown as Record<string, string>).orderId;
 
     // 2) 포트원 결제창 (콜백 rsp: unknown → 타입가드)
-    await new Promise<void>((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
+        const payParams: PortOnePayRequest = {
+            pg,
+            pay_method: payMethod,
+            merchant_uid: orderId,
+            name: "포인트 충전",
+            amount,
+            ...(buyer.email ? { buyer_email: buyer.email } : {}),
+            ...(buyer.name ? { buyer_name: buyer.name } : {}),
+            ...(buyer.tel ? { buyer_tel: buyer.tel } : {}),
+        };
+
         IMP.request_pay(
-            {
-                pg,
-                pay_method: payMethod,
-                merchant_uid: orderId,
-                name: "포인트 충전",
-                amount,
-                buyer_email: buyer.email ?? "test@example.com",
-                buyer_name: buyer.name ?? "홍길동",
-                buyer_tel: buyer.tel ?? "010-0000-0000",
-            },
+            payParams,
             async (rspUnknown: unknown) => {
                 if (!isPortOnePayResponse(rspUnknown)) {
                     const msg = "결제 콜백 응답 형식 오류";
@@ -127,6 +137,7 @@ export async function startPortoneCharge(params: {
                     return;
                 }
 
+                // 3) 승인(검증)
                 try {
                     const approveRes = await fetch(
                         api(`/api/portone/approve?impUid=${encodeURIComponent(rsp.imp_uid ?? "")}`)
@@ -136,18 +147,21 @@ export async function startPortoneCharge(params: {
                     if (!approveRes.ok) {
                         const err = new Error("approve 실패: " + text);
                         alert(err.message);
-                        reject(err);     // ← throw 대신 reject
-                        return;          // ← resolve()로 내려가지 않게 즉시 종료
+                        reject(err);   // ← throw 대신 reject로 명확한 실패 처리
+                        return;
                     }
 
                     alert("서버 응답: " + text);
-                    resolve();
+                    resolve({
+                        impUid: rsp.imp_uid,
+                        merchantUid: rsp.merchant_uid,
+                        orderId,
+                    });
                 } catch (e) {
                     const msg = getErrorMessage(e);
                     alert("승인 요청 중 오류: " + msg);
                     reject(new Error(msg));
                 }
-
             }
         );
     });
