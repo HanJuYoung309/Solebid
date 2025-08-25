@@ -132,14 +132,22 @@ export async function startPortoneCharge(params: {
                         api(`/api/portone/approve?impUid=${encodeURIComponent(rsp.imp_uid ?? "")}`)
                     );
                     const text = await approveRes.text();
-                    if (!approveRes.ok) throw new Error("approve 실패: " + text);
+
+                    if (!approveRes.ok) {
+                        const err = new Error("approve 실패: " + text);
+                        alert(err.message);
+                        reject(err);     // ← throw 대신 reject
+                        return;          // ← resolve()로 내려가지 않게 즉시 종료
+                    }
+
                     alert("서버 응답: " + text);
                     resolve();
-                } catch (e: unknown) {
+                } catch (e) {
                     const msg = getErrorMessage(e);
                     alert("승인 요청 중 오류: " + msg);
                     reject(new Error(msg));
                 }
+
             }
         );
     });
