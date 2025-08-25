@@ -1,31 +1,62 @@
-import { API_HOST, PORTONE_MERCHANT_ID, PORTONE_SDK_URL } from "../constants/portone";
+// src/features/payment/services/portoneService.ts
+import { api, PORTONE_MERCHANT_ID, PORTONE_SDK_URL } from "../constants/portone";
+import type {
+    PortOneIMP,
+    PortOnePayMethod,
+    PortOnePayResponse,
+} from "../constants/portone";
 
-/** window.IMP 타입 보완 */
-declare global {
-    interface Window {
-        IMP: any;
-    }
+/* ---------- type guards (unknown → 구체 타입으로 내로잉) ---------- */
+function isRecord(v: unknown): v is Record<string, unknown> {
+    return typeof v === "object" && v !== null;
+}
+function hasString(r: Record<string, unknown>, k: string): r is Record<string, string> {
+    return typeof r[k] === "string";
+}
+function isPortOneIMP(v: unknown): v is PortOneIMP {
+    return isRecord(v)
+        && typeof (v as Record<string, unknown>).init === "function"
+        && typeof (v as Record<string, unknown>).request_pay === "function";
+}
+function isPortOnePayResponse(v: unknown): v is PortOnePayResponse {
+    if (!isRecord(v)) return false;
+    const success = v["success"];
+    const imp_uid = v["imp_uid"];
+    const merchant_uid = v["merchant_uid"];
+    const error_msg = v["error_msg"];
+    return typeof success === "boolean"
+        && (imp_uid === undefined || typeof imp_uid === "string")
+        && (merchant_uid === undefined || typeof merchant_uid === "string")
+        && (error_msg === undefined || typeof error_msg === "string");
+}
+function getErrorMessage(err: unknown): string {
+    return err instanceof Error ? err.message : String(err);
 }
 
-/** SDK 동적 로딩 (index.html 수정 불필요) */
-async function loadPortoneSDK(): Promise<any> {
-    if (window.IMP) return window.IMP;
-
+/* ---------- SDK 로딩 ---------- */
+async function loadPortoneSDK(): Promise<PortOneIMP> {
+    if (isPortOneIMP((window as unknown as { IMP?: unknown }).IMP)) {
+        return (window as { IMP: PortOneIMP }).IMP;
+    }
     await new Promise<void>((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = PORTONE_SDK_URL;
-        script.async = true;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error("PortOne SDK 로드 실패"));
-        document.head.appendChild(script);
+        const s = document.createElement("script");
+        s.src = PORTONE_SDK_URL;
+        s.async = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("PortOne SDK 로드 실패"));
+        document.head.appendChild(s);
     });
 
-    return window.IMP;
+    const impUnknown: unknown = (window as unknown as { IMP?: unknown }).IMP;
+    if (!isPortOneIMP(impUnknown)) {
+        throw new Error("PortOne SDK 로드 실패(IMP 미탑재)");
+    }
+    return impUnknown;
 }
 
-type PayMethod = "card" | "trans" | "vbank";
+type PayMethod = PortOnePayMethod;
 
-/** 포인트 충전 - 포트원 플로우 한 번에 실행 */
+/* ---------- 메인 함수 ---------- */
 export async function startPortoneCharge(params: {
     amount: number;
     payMethod?: PayMethod; // default: card
@@ -41,11 +72,15 @@ export async function startPortoneCharge(params: {
         pg = "html5_inicis",
     } = params;
 
+    if (!PORTONE_MERCHANT_ID) {
+        throw new Error("VITE_PORTONE_IMP_KEY가 설정되지 않았습니다.");
+    }
+
     const IMP = await loadPortoneSDK();
     IMP.init(PORTONE_MERCHANT_ID);
 
-    // 1) 서버 준비(주문번호 발급)
-    const prepareRes = await fetch(`${API_HOST}/api/payments/charge/prepare`, {
+    // 1) 주문 준비 (서버 응답 JSON → unknown → 타입가드)
+    const prepareRes = await fetch(api("/api/payments/charge/prepare"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -54,19 +89,21 @@ export async function startPortoneCharge(params: {
             redirectUrl,
         }),
     });
-
     if (!prepareRes.ok) {
-        const text = await prepareRes.text();
-        throw new Error("prepare 실패: " + text);
+        throw new Error("prepare 실패: " + (await prepareRes.text()));
     }
-    const { orderId } = await prepareRes.json();
+    const jsonUnknown: unknown = await prepareRes.json();
+    if (!isRecord(jsonUnknown) || !hasString(jsonUnknown, "orderId")) {
+        throw new Error("prepare 응답 형식 오류");
+    }
+    const orderId = (jsonUnknown as Record<string, string>).orderId;
 
-    // 2) 포트원 결제창
+    // 2) 포트원 결제창 (콜백 rsp: unknown → 타입가드)
     await new Promise<void>((resolve, reject) => {
         IMP.request_pay(
             {
                 pg,
-                pay_method: payMethod, // 'card' | 'trans' | 'vbank'
+                pay_method: payMethod,
                 merchant_uid: orderId,
                 name: "포인트 충전",
                 amount,
@@ -74,28 +111,34 @@ export async function startPortoneCharge(params: {
                 buyer_name: buyer.name ?? "홍길동",
                 buyer_tel: buyer.tel ?? "010-0000-0000",
             },
-            async (rsp: any) => {
+            async (rspUnknown: unknown) => {
+                if (!isPortOnePayResponse(rspUnknown)) {
+                    const msg = "결제 콜백 응답 형식 오류";
+                    alert(msg);
+                    reject(new Error(msg));
+                    return;
+                }
+                const rsp = rspUnknown;
+
                 if (!rsp.success) {
-                    alert("결제 실패: " + rsp.error_msg);
-                    reject(new Error(rsp.error_msg));
+                    const msg = rsp.error_msg ?? "결제 실패";
+                    alert("결제 실패: " + msg);
+                    reject(new Error(msg));
                     return;
                 }
 
-                // 3) 승인(검증)
                 try {
                     const approveRes = await fetch(
-                        `${API_HOST}/api/portone/approve?impUid=${encodeURIComponent(
-                            rsp.imp_uid
-                        )}`
+                        api(`/api/portone/approve?impUid=${encodeURIComponent(rsp.imp_uid ?? "")}`)
                     );
                     const text = await approveRes.text();
                     if (!approveRes.ok) throw new Error("approve 실패: " + text);
-
                     alert("서버 응답: " + text);
                     resolve();
-                } catch (e: any) {
-                    alert("승인 요청 중 오류: " + e.message);
-                    reject(e);
+                } catch (e: unknown) {
+                    const msg = getErrorMessage(e);
+                    alert("승인 요청 중 오류: " + msg);
+                    reject(new Error(msg));
                 }
             }
         );
